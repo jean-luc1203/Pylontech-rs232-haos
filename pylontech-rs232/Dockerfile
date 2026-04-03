@@ -1,45 +1,35 @@
-ARG BUILD_FROM
+ARG BUILD_FROM=ghcr.io/hassio-addons/base:15.0.7
 FROM ${BUILD_FROM}
-
-ENV LANG=C.UTF-8
-ENV NODE_ENV=production
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 # --------------------------------------------------
-# System packages
+# Base packages
 # --------------------------------------------------
-RUN apk add --no-cache \
-    bash \
-    curl \
-    jq \
-    tzdata \
-    python3 \
-    make \
-    g++ \
-    git
+RUN apk add --no-cache bash jq nodejs-lts npm \
+  || apk add --no-cache bash jq "nodejs~22" "npm~10"
 
 # --------------------------------------------------
-# Node-RED
+# Node-RED 4.x
 # --------------------------------------------------
-RUN npm install -g --unsafe-perm --no-update-notifier --no-fund \
-    node-red@4
+RUN npm install -g node-red@4.1.4 \
+  && npm cache clean --force
 
 # --------------------------------------------------
-# Required Node-RED modules (flow dependency)
+# Node-RED modules required by the flow
 # --------------------------------------------------
-RUN cd /usr/lib && \
-    npm install --unsafe-perm --no-update-notifier --no-fund \
-    node-red-node-serialport@2.0.3
+WORKDIR /opt
+RUN apk add --no-cache --virtual .build-deps \
+      build-base linux-headers python3 make g++ \
+  && npm i --omit=dev --no-audit --no-fund node-red-node-serialport@2.0.3 \
+  && apk del .build-deps \
+  && npm cache clean --force
 
 # --------------------------------------------------
 # Add-on files
 # --------------------------------------------------
-COPY run.sh /
-COPY settings.js /addon/
-COPY flows.json /addon/
-COPY flows_version.txt /addon/
+COPY . /addon
+RUN chmod a+x /addon/run.sh
 
-RUN chmod +x /run.sh
-
-CMD [ "/run.sh" ]
+WORKDIR /addon
+ENTRYPOINT ["/addon/run.sh"]
