@@ -1,11 +1,14 @@
 ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
-ENV LANG C.UTF-8
+ENV LANG=C.UTF-8
 ENV NODE_ENV=production
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
+# --------------------------------------------------
+# System packages
+# --------------------------------------------------
 RUN apk add --no-cache \
     bash \
     curl \
@@ -16,19 +19,30 @@ RUN apk add --no-cache \
     g++ \
     git
 
+# --------------------------------------------------
+# Node-RED
+# --------------------------------------------------
 RUN npm install -g --unsafe-perm --no-update-notifier --no-fund \
     node-red@4
 
-# Module seen in the uploaded flow
+# --------------------------------------------------
+# External Node-RED modules required by the flow
+# --------------------------------------------------
 RUN cd /usr/lib && \
     npm install --unsafe-perm --no-update-notifier --no-fund \
     node-red-node-serialport@2.0.3
 
+# --------------------------------------------------
+# Add-on files
+# --------------------------------------------------
 COPY run.sh /run.sh
 COPY settings.js /addon/settings.js
 COPY flows.json /addon/flows.json
 COPY flows_version.txt /addon/flows_version.txt
 
-RUN chmod +x /run.sh
+RUN chmod a+x /run.sh
 
+# --------------------------------------------------
+# Start add-on
+# --------------------------------------------------
 CMD [ "/run.sh" ]
