@@ -353,5 +353,5 @@ fi
 # ============================================================
 # Start Node-RED
 # ============================================================
-logi "Starting Node-RED sur le port 1892..."
-exec node-red --userDir /data --settings /addon/settings.js
+logi "Starting Node-RED sur le port 1893..."
+exec node-red --userDir /data --settings /addon/settings.js --port 1893
