@@ -26,7 +26,7 @@ RUN npm install -g --unsafe-perm --no-update-notifier --no-fund \
     node-red@4
 
 # --------------------------------------------------
-# External Node-RED modules required by the flow
+# Required Node-RED modules (flow dependency)
 # --------------------------------------------------
 RUN cd /usr/lib && \
     npm install --unsafe-perm --no-update-notifier --no-fund \
@@ -35,14 +35,11 @@ RUN cd /usr/lib && \
 # --------------------------------------------------
 # Add-on files
 # --------------------------------------------------
-COPY run.sh /run.sh
-COPY settings.js /addon/settings.js
-COPY flows.json /addon/flows.json
-COPY flows_version.txt /addon/flows_version.txt
+COPY run.sh /
+COPY settings.js /addon/
+COPY flows.json /addon/
+COPY flows_version.txt /addon/
 
-RUN chmod a+x /run.sh
+RUN chmod +x /run.sh
 
-# --------------------------------------------------
-# Start add-on
-# --------------------------------------------------
 CMD [ "/run.sh" ]
