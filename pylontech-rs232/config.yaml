@@ -1,0 +1,67 @@
+name: "Pylontech RS232 HAOS"
+version: "1.0.0"
+slug: "pylontech_rs232_haos"
+description: "Pylontech RS232 for Home Assistant using Node-RED with serial or gateway mode and MQTT integration."
+url: "https://github.com/jean-luc1203/Pylontech-rs232-haos/tree/main/Pylontech-rs232-haos"
+
+startup: application
+boot: auto
+init: false
+
+arch:
+  - aarch64
+  - amd64
+  - armv7
+  - i386
+
+panel_icon: mdi:battery-high
+panel_title: "Pylontech RS232"
+ingress: true
+ingress_port: 1880
+
+homeassistant_api: true
+hassio_api: true
+uart: true
+
+map:
+  - addon_config:rw
+  - homeassistant_config:rw
+  - share:rw
+
+ports:
+  1880/tcp: 1880
+
+ports_description:
+  1880/tcp: "Node-RED web interface"
+
+options:
+  pylontech_path: "/dev/serial/by-id/CHANGE-ME"
+  use_gateway: false
+  gateway_ip: ""
+  gateway_port: 8899
+  communication_debug: false
+
+  mqttadresse: "core-mosquitto"
+  mqttport: 1883
+  mqttuser: ""
+  mqttpass: ""
+  mqtt_client_id: "nodered_pylontech"
+  mqtt_base_topic: "pylontech1"
+
+  Send_bip: true
+
+schema:
+  pylontech_path: "str"
+  use_gateway: "bool"
+  gateway_ip: "str?"
+  gateway_port: "port"
+  communication_debug: "bool"
+
+  mqttadresse: "str"
+  mqttport: "port"
+  mqttuser: "str?"
+  mqttpass: "password?"
+  mqtt_client_id: "str"
+  mqtt_base_topic: "str"
+
+  Send_bip: "bool"
