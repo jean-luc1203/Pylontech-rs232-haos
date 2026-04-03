@@ -4,7 +4,7 @@ module.exports = {
  * Node-RED UI
  * -------------------------------------------------- */
 
-uiPort: process.env.PORT || 1880,
+uiPort: process.env.PORT || 1893,
 uiHost: "0.0.0.0",
 
 /* --------------------------------------------------
