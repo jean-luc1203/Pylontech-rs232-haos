@@ -27,7 +27,10 @@ map:
     read_only: false
 
 ports:
-  1892/tcp: 1892
+  1893/tcp: 1893
+
+ports_description:
+  1893/tcp: "Node-RED web interface"
 
 panel_icon: mdi:battery-high
 
