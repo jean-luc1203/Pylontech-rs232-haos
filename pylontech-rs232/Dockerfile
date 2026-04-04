@@ -17,9 +17,11 @@ RUN npm install -g node-red@4.1.4 \
 
 # --------------------------------------------------
 # Node-RED modules required by the flow
+# IMPORTANT: install in /data because Node-RED runs with --userDir /data
 # --------------------------------------------------
-WORKDIR /opt
-RUN apk add --no-cache --virtual .build-deps \
+WORKDIR /data
+RUN mkdir -p /data \
+  && apk add --no-cache --virtual .build-deps \
       build-base linux-headers python3 make g++ \
   && npm i --omit=dev --no-audit --no-fund node-red-node-serialport@2.0.3 \
   && apk del .build-deps \
