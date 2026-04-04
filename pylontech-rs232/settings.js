@@ -22,10 +22,14 @@ module.exports = {
     },
 
     /* --------------------------------------------------
-     * Flow file
-     * With --userDir /data this resolves to /data/flows.json
+     * Force correct flow file
      * -------------------------------------------------- */
-    flowFile: "flows.json",
+    flowFile: "/data/flows.json",
+
+    /* --------------------------------------------------
+     * Load extra nodes installed in image
+     * -------------------------------------------------- */
+    nodesDir: "/opt/node_modules",
 
     /* --------------------------------------------------
      * Logging
