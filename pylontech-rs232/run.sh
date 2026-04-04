@@ -264,22 +264,24 @@ fi
 # ============================================================
 # Premium env
 # ============================================================
-INSTANCE_FILE="/data/pylontech_rs232_instance_id"
+INSTALL_ID_FILE="/data/pylontech_rs232_install_id"
 
-if [ ! -f "$INSTANCE_FILE" ]; then
-  cat /proc/sys/kernel/random/uuid > "$INSTANCE_FILE"
-  logi "Premium: nouvel instance_id généré"
+if [ ! -f "$INSTALL_ID_FILE" ]; then
+  cat /proc/sys/kernel/random/uuid | tr -d '-' > "$INSTALL_ID_FILE"
+  logi "Premium: nouvel install_id généré"
 fi
 
-PYLONTECH_RS232_INSTANCE_ID="$(tr -d '\n\r' < "$INSTANCE_FILE")"
+PYLONTECH_RS232_INSTALL_ID="$(tr -d '\n\r' < "$INSTALL_ID_FILE")"
 PYLONTECH_RS232_PREMIUM_KEY="$(jq -r '.premium_license // ""' "$OPTS")"
 
-export PYLONTECH_RS232_INSTANCE_ID
+export PYLONTECH_RS232_INSTALL_ID
 export PYLONTECH_RS232_PREMIUM_KEY
 
-# compat future logique premium proche smart voltronic
-export SMARTPHOTON_INSTANCE_ID="$PYLONTECH_RS232_INSTANCE_ID"
+# compat éventuelle
+export SMARTPHOTON_INSTALL_ID="$PYLONTECH_RS232_INSTALL_ID"
 export SMARTPHOTON_PREMIUM_KEY="$PYLONTECH_RS232_PREMIUM_KEY"
+
+logi "Premium install_id=${PYLONTECH_RS232_INSTALL_ID}"
 
 # ============================================================
 # Dashboard flag
