@@ -1,5 +1,5 @@
 name: "Pylontech RS232 HAOS"
-version: "1.0.0"
+version: "1.0.1"
 slug: pylontech_rs232_haos
 description: "Node-RED Pylontech plug & play: flow mis à jour via MAJ add-on"
 
