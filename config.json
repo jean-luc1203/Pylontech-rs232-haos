@@ -1,6 +1,6 @@
 {
   "name": "Pylontech RS232 HAOS Add-on",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "slug": "pylontech_rs232_haos",
   "description": "Pylontech RS232 integration for Home Assistant using Node-RED",
   "url": "https://github.com/jean-luc1203/Pylontech-rs232-haos",
