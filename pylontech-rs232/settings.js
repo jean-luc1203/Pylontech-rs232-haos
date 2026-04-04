@@ -1,159 +1,128 @@
 module.exports = {
+    /* --------------------------------------------------
+     * Node-RED UI
+     * -------------------------------------------------- */
+    uiPort: process.env.PORT || 1893,
+    uiHost: "0.0.0.0",
 
-/* --------------------------------------------------
- * Node-RED UI
- * -------------------------------------------------- */
+    /* --------------------------------------------------
+     * Security
+     * -------------------------------------------------- */
+    adminAuth: null,
+    httpNodeAuth: null,
+    httpStaticAuth: null,
 
-uiPort: process.env.PORT || 1893,
-uiHost: "0.0.0.0",
-
-/* --------------------------------------------------
- * Security
- * -------------------------------------------------- */
-
-adminAuth: null,
-
-httpNodeAuth: null,
-
-httpStaticAuth: null,
-
-/* --------------------------------------------------
- * Projects disabled (avoid warnings)
- * -------------------------------------------------- */
-
-editorTheme: {
-    projects: {
-        enabled: false
-    }
-},
-
-/* --------------------------------------------------
- * Flow file
- * -------------------------------------------------- */
-
-flowFile: 'flows.json',
-
-/* --------------------------------------------------
- * Logging
- * -------------------------------------------------- */
-
-logging: {
-
-    console: {
-        level: "info",
-        metrics: false,
-        audit: false
-    }
-},
-
-/* --------------------------------------------------
- * Context storage (IMPORTANT)
- * Needed for persistent states
- * -------------------------------------------------- */
-
-contextStorage: {
-
-    default: {
-        module: "memory"
+    /* --------------------------------------------------
+     * Projects disabled
+     * -------------------------------------------------- */
+    editorTheme: {
+        projects: {
+            enabled: false
+        }
     },
 
-    persistent: {
-        module: "localfilesystem"
-    }
-},
+    /* --------------------------------------------------
+     * Flow file
+     * With --userDir /data this resolves to /data/flows.json
+     * -------------------------------------------------- */
+    flowFile: "flows.json",
 
-/* --------------------------------------------------
- * Allow modules inside function nodes
- * -------------------------------------------------- */
+    /* --------------------------------------------------
+     * Logging
+     * -------------------------------------------------- */
+    logging: {
+        console: {
+            level: "info",
+            metrics: false,
+            audit: false
+        }
+    },
 
-functionExternalModules: true,
+    /* --------------------------------------------------
+     * Context storage
+     * -------------------------------------------------- */
+    contextStorage: {
+        default: {
+            module: "memory"
+        },
+        persistent: {
+            module: "localfilesystem"
+        }
+    },
 
-functionGlobalContext: {
+    /* --------------------------------------------------
+     * Allow modules in function nodes
+     * -------------------------------------------------- */
+    functionExternalModules: true,
 
-    crypto: require('crypto'),
+    functionGlobalContext: {
+        crypto: require("crypto"),
+        fs: require("fs"),
+        path: require("path"),
+        os: require("os"),
+        Buffer: Buffer
+    },
 
-    fs: require('fs'),
+    /* --------------------------------------------------
+     * Reconnect timings
+     * -------------------------------------------------- */
+    mqttReconnectTime: 15000,
+    serialReconnectTime: 15000,
 
-    path: require('path'),
+    /* --------------------------------------------------
+     * Diagnostics
+     * -------------------------------------------------- */
+    diagnostics: {
+        enabled: false
+    },
 
-    os: require('os'),
+    /* --------------------------------------------------
+     * Runtime state
+     * -------------------------------------------------- */
+    runtimeState: {
+        enabled: false,
+        ui: false
+    },
 
-    Buffer: Buffer
-},
+    /* --------------------------------------------------
+     * External modules / palette
+     * -------------------------------------------------- */
+    externalModules: {
+        autoInstall: false,
+        autoInstallRetry: 30,
+        palette: {
+            allowInstall: true,
+            allowUpload: false
+        }
+    },
 
-/* --------------------------------------------------
- * MQTT reconnect stability
- * -------------------------------------------------- */
+    /* --------------------------------------------------
+     * HTTP settings
+     * -------------------------------------------------- */
+    httpNodeCors: {
+        origin: "*",
+        methods: "GET,PUT,POST,DELETE"
+    },
 
-mqttReconnectTime: 15000,
+    /* --------------------------------------------------
+     * Dashboard path
+     * -------------------------------------------------- */
+    ui: {
+        path: "ui"
+    },
 
-serialReconnectTime: 15000,
+    /* --------------------------------------------------
+     * Environment defaults
+     * -------------------------------------------------- */
+    env: {},
 
-/* --------------------------------------------------
- * Disable diagnostics
- * -------------------------------------------------- */
+    /* --------------------------------------------------
+     * Flow formatting
+     * -------------------------------------------------- */
+    flowFilePretty: false,
 
-diagnostics: {
-    enabled: false
-},
-
-/* --------------------------------------------------
- * Runtime options
- * -------------------------------------------------- */
-
-runtimeState: {
-    enabled: false,
-    ui: false
-},
-
-/* --------------------------------------------------
- * Palette
- * -------------------------------------------------- */
-
-externalModules: {
-    autoInstall: false,
-    autoInstallRetry: 30,
-    palette: {
-        allowInstall: true,
-        allowUpload: false
-    }
-},
-
-/* --------------------------------------------------
- * HTTP settings
- * -------------------------------------------------- */
-
-httpNodeCors: {
-    origin: "*",
-    methods: "GET,PUT,POST,DELETE"
-},
-
-/* --------------------------------------------------
- * Dashboard
- * -------------------------------------------------- */
-
-ui: {
-    path: "ui"
-},
-
-/* --------------------------------------------------
- * Environment safe defaults
- * -------------------------------------------------- */
-
-env: {
-
-},
-
-/* --------------------------------------------------
- * Disable flow file pretty formatting
- * -------------------------------------------------- */
-
-flowFilePretty: false,
-
-/* --------------------------------------------------
- * Node timeout
- * -------------------------------------------------- */
-
-nodeMessageBufferMaxLength: 0
-
+    /* --------------------------------------------------
+     * Buffer
+     * -------------------------------------------------- */
+    nodeMessageBufferMaxLength: 0
 };
