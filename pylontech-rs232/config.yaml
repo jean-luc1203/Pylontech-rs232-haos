@@ -65,6 +65,7 @@ options:
   # ============================================================
   dashboard_section: "────────── DASHBOARD ──────────"
   dashboard_custom_cards_installed: false
+  dashboard_language: "fr"
 
   # ============================================================
   # 🔔 OPTIONS
@@ -98,6 +99,7 @@ schema:
 
   dashboard_section: str?
   dashboard_custom_cards_installed: bool
+  dashboard_language: list(fr|en)
 
   send_bip: bool
   communication_debug: bool
