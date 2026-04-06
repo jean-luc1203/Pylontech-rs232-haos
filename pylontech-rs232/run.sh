@@ -6,10 +6,12 @@ echo "### RUN.SH PYLONTECH RS232 HAOS START ###"
 if [ -f /usr/lib/bashio/bashio.sh ]; then
   # shellcheck disable=SC1091
   source /usr/lib/bashio/bashio.sh
+  HAS_BASHIO="true"
   logi(){ bashio::log.info "$1"; }
   logw(){ bashio::log.warning "$1"; }
   loge(){ bashio::log.error "$1"; }
 else
+  HAS_BASHIO="false"
   logi(){ echo "[INFO] $1"; }
   logw(){ echo "[WARN] $1"; }
   loge(){ echo "[ERROR] $1"; }
@@ -33,24 +35,29 @@ mkdir -p /data/pylontech-rs232-haos
 # ============================================================
 # Helpers
 # ============================================================
-jq_str_or() {
-  local jq_expr="$1"
-  local fallback="$2"
-  jq -r "($jq_expr // \"\") | if (type==\"string\" and length>0) then . else \"$fallback\" end" "$OPTS"
-}
-
-jq_int_or() {
-  local jq_expr="$1"
-  local fallback="$2"
-  jq -r "($jq_expr // $fallback) | tonumber" "$OPTS" 2>/dev/null || echo "$fallback"
-}
-
 sanitize_transport() {
   local v="$1"
   case "$v" in
     serial) echo "serial" ;;
     gateway|tcp) echo "tcp" ;;
     *) echo "serial" ;;
+  esac
+}
+
+normalize_bool() {
+  local v="${1:-false}"
+  case "$v" in
+    true|True|TRUE|1|yes|Yes|YES|on|ON) echo "true" ;;
+    *) echo "false" ;;
+  esac
+}
+
+normalize_dashboard_language() {
+  local v="${1:-fr}"
+  case "$v" in
+    fr|FR) echo "fr" ;;
+    en|EN) echo "en" ;;
+    *) echo "fr" ;;
   esac
 }
 
@@ -77,6 +84,23 @@ is_valid_port() {
   local p="$1"
   [[ "$p" =~ ^[0-9]+$ ]] || return 1
   [ "$p" -ge 1 ] && [ "$p" -le 65535 ]
+}
+
+cfg() {
+  local key="$1"
+  local fallback="${2:-}"
+
+  if [ "$HAS_BASHIO" = "true" ]; then
+    local value
+    value="$(bashio::config "$key" 2>/dev/null || true)"
+    if [ -n "${value:-}" ] && [ "$value" != "null" ]; then
+      echo "$value"
+    else
+      echo "$fallback"
+    fi
+  else
+    echo "$fallback"
+  fi
 }
 
 patch_serial_node_by_name() {
@@ -159,27 +183,32 @@ build_flows_cred_for_broker() {
 # ============================================================
 # Read add-on config
 # ============================================================
-LINK="$(bashio::config 'link')"
-SERIAL_PORT="$(bashio::config 'serial_port')"
-GATEWAY_HOST="$(bashio::config 'gateway_host')"
-GATEWAY_PORT="$(bashio::config 'gateway_port')"
+LINK="$(cfg 'link' 'serial')"
+SERIAL_PORT="$(cfg 'serial_port' '/dev/serial/by-id/CHANGE-ME')"
+GATEWAY_HOST="$(cfg 'gateway_host' '')"
+GATEWAY_PORT="$(cfg 'gateway_port' '8899')"
 
-MQTT_HOST="$(bashio::config 'mqtt_host')"
-MQTT_PORT="$(bashio::config 'mqtt_port')"
-MQTT_USER="$(bashio::config 'mqtt_user')"
-MQTT_PASS="$(bashio::config 'mqtt_pass')"
-MQTT_BASE_TOPIC="$(bashio::config 'mqtt_base_topic')"
-MQTT_CLIENT_ID="$(bashio::config 'mqtt_client_id')"
+MQTT_HOST="$(cfg 'mqtt_host' 'core-mosquitto')"
+MQTT_PORT="$(cfg 'mqtt_port' '1883')"
+MQTT_USER="$(cfg 'mqtt_user' '')"
+MQTT_PASS="$(cfg 'mqtt_pass' '')"
+MQTT_BASE_TOPIC="$(cfg 'mqtt_base_topic' 'pylontech1')"
+MQTT_CLIENT_ID="$(cfg 'mqtt_client_id' 'nodered_pylontech')"
 
-PREMIUM_KEY="$(bashio::config 'premium_key')"
+PREMIUM_KEY="$(cfg 'premium_key' '')"
 
-DASHBOARD_CUSTOM_CARDS_INSTALLED="$(bashio::config 'dashboard_custom_cards_installed')"
+DASHBOARD_CUSTOM_CARDS_INSTALLED_RAW="$(cfg 'dashboard_custom_cards_installed' 'false')"
+DASHBOARD_CUSTOM_CARDS_INSTALLED="$(normalize_bool "$DASHBOARD_CUSTOM_CARDS_INSTALLED_RAW")"
+DASHBOARD_LANGUAGE_RAW="$(cfg 'dashboard_language' 'fr')"
+DASHBOARD_LANGUAGE="$(normalize_dashboard_language "$DASHBOARD_LANGUAGE_RAW")"
 
-SEND_BIP="$(bashio::config 'send_bip')"
-COMM_DEBUG="$(bashio::config 'communication_debug')"
+SEND_BIP_RAW="$(cfg 'send_bip' 'true')"
+SEND_BIP="$(normalize_bool "$SEND_BIP_RAW")"
+COMM_DEBUG_RAW="$(cfg 'communication_debug' 'false')"
+COMM_DEBUG="$(normalize_bool "$COMM_DEBUG_RAW")"
 
-TIMEZONE_MODE="$(bashio::config 'timezone_mode')"
-TIMEZONE_CUSTOM="$(bashio::config 'timezone_custom')"
+TIMEZONE_MODE="$(cfg 'timezone_mode' 'Europe/Paris')"
+TIMEZONE_CUSTOM="$(cfg 'timezone_custom' 'UTC')"
 
 TRANSPORT="$(sanitize_transport "$LINK")"
 
@@ -202,12 +231,12 @@ else
   fi
 fi
 
-if [ -z "${MQTT_HOST}" ]; then
+if [ -z "$MQTT_HOST" ]; then
   loge "mqtt_host vide. Renseigne-le dans la config add-on."
   exit 1
 fi
 
-if [ -z "${MQTT_USER}" ] || [ -z "${MQTT_PASS}" ]; then
+if [ -z "$MQTT_USER" ] || [ -z "$MQTT_PASS" ]; then
   loge "mqtt_user ou mqtt_pass vide. Renseigne-les dans la config add-on."
   exit 1
 fi
@@ -216,22 +245,23 @@ fi
 # Build /data/options.json expected by the flow
 # ============================================================
 jq -n \
-  --arg pylontech_path "${SERIAL_PORT}" \
+  --arg pylontech_path "$SERIAL_PORT" \
   --argjson use_gateway "$([ "$TRANSPORT" = "tcp" ] && echo true || echo false)" \
-  --arg gateway_ip "${GATEWAY_HOST}" \
-  --argjson gateway_port "${GATEWAY_PORT}" \
-  --argjson communication_debug "${COMM_DEBUG}" \
-  --arg mqttadresse "${MQTT_HOST}" \
-  --argjson mqttport "${MQTT_PORT}" \
-  --arg mqttuser "${MQTT_USER}" \
-  --arg mqttpass "${MQTT_PASS}" \
-  --arg mqtt_client_id "${MQTT_CLIENT_ID}" \
-  --arg mqtt_base_topic "${MQTT_BASE_TOPIC}" \
-  --argjson Send_bip "${SEND_BIP}" \
-  --arg premium_license "${PREMIUM_KEY}" \
-  --argjson dashboard_custom_cards_installed "${DASHBOARD_CUSTOM_CARDS_INSTALLED}" \
-  --arg timezone_mode "${TIMEZONE_MODE}" \
-  --arg timezone_custom "${TIMEZONE_CUSTOM}" \
+  --arg gateway_ip "$GATEWAY_HOST" \
+  --argjson gateway_port "$GATEWAY_PORT" \
+  --argjson communication_debug "$COMM_DEBUG" \
+  --arg mqttadresse "$MQTT_HOST" \
+  --argjson mqttport "$MQTT_PORT" \
+  --arg mqttuser "$MQTT_USER" \
+  --arg mqttpass "$MQTT_PASS" \
+  --arg mqtt_client_id "$MQTT_CLIENT_ID" \
+  --arg mqtt_base_topic "$MQTT_BASE_TOPIC" \
+  --argjson Send_bip "$SEND_BIP" \
+  --arg premium_license "$PREMIUM_KEY" \
+  --argjson dashboard_custom_cards_installed "$DASHBOARD_CUSTOM_CARDS_INSTALLED" \
+  --arg dashboard_language "$DASHBOARD_LANGUAGE" \
+  --arg timezone_mode "$TIMEZONE_MODE" \
+  --arg timezone_custom "$TIMEZONE_CUSTOM" \
 '{
   pylontech_path: $pylontech_path,
   use_gateway: $use_gateway,
@@ -251,6 +281,7 @@ jq -n \
   premium_license: $premium_license,
 
   dashboard_custom_cards_installed: $dashboard_custom_cards_installed,
+  dashboard_language: $dashboard_language,
 
   timezone_mode: $timezone_mode,
   timezone_custom: $timezone_custom
@@ -284,9 +315,10 @@ export SMARTPHOTON_PREMIUM_KEY="$PYLONTECH_RS232_PREMIUM_KEY"
 logi "Premium install_id=${PYLONTECH_RS232_INSTALL_ID}"
 
 # ============================================================
-# Dashboard flag
+# Dashboard env
 # ============================================================
 export DASHBOARD_CUSTOM_CARDS_INSTALLED
+export DASHBOARD_LANGUAGE
 
 # ============================================================
 # Timezone
@@ -331,10 +363,12 @@ build_flows_cred_for_broker "HAOS Mosquitto" "$MQTT_USER" "$MQTT_PASS"
 # ============================================================
 # Summary
 # ============================================================
-logi "Config OK | MQTT=${MQTT_HOST}:${MQTT_PORT} | TZ=${ADDON_TIMEZONE} | transport=${TRANSPORT}"
+logi "Config OK | MQTT=${MQTT_HOST}:${MQTT_PORT} | TZ=${ADDON_TIMEZONE} | transport=${TRANSPORT} | dashboard_lang=${DASHBOARD_LANGUAGE}"
 
 if [ "$DASHBOARD_CUSTOM_CARDS_INSTALLED" != "true" ]; then
-  logw "Dashboard: mode standard tant que dashboard_custom_cards_installed=false"
+  logw "Dashboard: mode fallback natif Home Assistant (dashboard_custom_cards_installed=false)"
+else
+  logi "Dashboard: mode premium custom cards activé"
 fi
 
 # ============================================================
