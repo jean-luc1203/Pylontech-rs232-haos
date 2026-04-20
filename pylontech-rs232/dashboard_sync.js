@@ -4,6 +4,20 @@
 const fs = require("fs");
 const path = require("path");
 
+let WebSocketImpl = globalThis.WebSocket;
+if (!WebSocketImpl) {
+  try {
+    WebSocketImpl = require("ws");
+  } catch (err) {
+    console.error(JSON.stringify({
+      ok: false,
+      error: "WebSocket unavailable: neither global WebSocket nor 'ws' package found",
+      details: String(err && err.message ? err.message : err)
+    }));
+    process.exit(1);
+  }
+}
+
 const action = process.argv[2] || "upsert";
 const filePath = process.argv[3] || "/config/dashboards/smart_pylontech.json";
 
@@ -12,11 +26,6 @@ const wsUrl = "ws://supervisor/core/websocket";
 
 if (!token) {
   console.error(JSON.stringify({ ok: false, error: "Supervisor token missing" }));
-  process.exit(1);
-}
-
-if (typeof WebSocket === "undefined") {
-  console.error(JSON.stringify({ ok: false, error: "Global WebSocket not available" }));
   process.exit(1);
 }
 
@@ -39,7 +48,7 @@ function deriveTitleFromSlug(slug) {
   return s
     .split("-")
     .filter(Boolean)
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 }
 
@@ -70,7 +79,7 @@ const icon = dashboardMeta.icon || fallbackIcon;
 const showInSidebar = dashboardMeta.show_in_sidebar !== false;
 const requireAdmin = !!dashboardMeta.require_admin;
 
-const ws = new WebSocket(wsUrl);
+const ws = new WebSocketImpl(wsUrl);
 let nextId = 1;
 const pending = new Map();
 let finished = false;
@@ -101,11 +110,25 @@ function finishErr(error) {
   process.exit(1);
 }
 
+function sendJson(payload) {
+  try {
+    ws.send(JSON.stringify(payload));
+  } catch (err) {
+    throw new Error(String(err?.message || err || "WebSocket send failed"));
+  }
+}
+
 function call(type, payload = {}) {
   return new Promise((resolve, reject) => {
     const id = nextId++;
     pending.set(id, { resolve, reject });
-    ws.send(JSON.stringify({ id, type, ...payload }));
+
+    try {
+      sendJson({ id, type, ...payload });
+    } catch (err) {
+      pending.delete(id);
+      reject(err);
+    }
   });
 }
 
@@ -178,15 +201,7 @@ async function deleteDashboard() {
       file: filePath
     };
   } catch (err) {
-    const msg = String(err?.message || err || "").toLowerCase();
-
-    if (
-      msg.includes("not found") ||
-      msg.includes("unknown") ||
-      msg.includes("does not exist") ||
-      msg.includes("no config") ||
-      msg.includes("not configured")
-    ) {
+    if (isDashboardMissingError(err)) {
       return {
         deleted: false,
         already_missing: true,
@@ -198,24 +213,34 @@ async function deleteDashboard() {
   }
 }
 
-ws.onerror = (event) => {
-  finishErr(event?.message || "WebSocket error");
-};
+function getEventData(event) {
+  if (typeof event === "string") return event;
+  if (Buffer.isBuffer(event)) return event.toString();
+  if (event && typeof event.data !== "undefined") {
+    if (Buffer.isBuffer(event.data)) return event.data.toString();
+    return String(event.data);
+  }
+  return String(event || "");
+}
 
-ws.onmessage = async (event) => {
+function handleMessage(raw) {
   let msg;
   try {
-    msg = JSON.parse(event.data.toString());
+    msg = JSON.parse(getEventData(raw));
   } catch (e) {
     finishErr("Invalid websocket message");
     return;
   }
 
   if (msg.type === "auth_required") {
-    ws.send(JSON.stringify({
-      type: "auth",
-      access_token: token
-    }));
+    try {
+      sendJson({
+        type: "auth",
+        access_token: token
+      });
+    } catch (err) {
+      finishErr(err?.message || err);
+    }
     return;
   }
 
@@ -225,19 +250,21 @@ ws.onmessage = async (event) => {
   }
 
   if (msg.type === "auth_ok") {
-    try {
-      let result;
+    (async () => {
+      try {
+        let result;
 
-      if (action === "delete") {
-        result = await deleteDashboard();
-      } else {
-        result = await createOrUpdateDashboard();
+        if (action === "delete") {
+          result = await deleteDashboard();
+        } else {
+          result = await createOrUpdateDashboard();
+        }
+
+        finishOk(result);
+      } catch (err) {
+        finishErr(err?.message || err);
       }
-
-      finishOk(result);
-    } catch (err) {
-      finishErr(err?.message || err);
-    }
+    })();
     return;
   }
 
@@ -253,4 +280,33 @@ ws.onmessage = async (event) => {
       waiter.resolve(msg.result);
     }
   }
-};
+}
+
+if (typeof ws.on === "function") {
+  ws.on("open", () => {});
+  ws.on("error", (err) => {
+    finishErr(err?.message || "WebSocket error");
+  });
+  ws.on("message", (data) => {
+    handleMessage(data);
+  });
+  ws.on("close", () => {
+    if (!finished) {
+      finishErr("WebSocket closed unexpectedly");
+    }
+  });
+} else {
+  ws.onerror = (event) => {
+    finishErr(event?.message || "WebSocket error");
+  };
+
+  ws.onmessage = (event) => {
+    handleMessage(event);
+  };
+
+  ws.onclose = () => {
+    if (!finished) {
+      finishErr("WebSocket closed unexpectedly");
+    }
+  };
+}
