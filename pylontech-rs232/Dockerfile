@@ -8,7 +8,9 @@ RUN apk add --no-cache \
     jq \
     tzdata
 
-RUN npm install -g --no-audit --no-fund --unsafe-perm node-red@4.1.4 \
+RUN npm install -g --no-audit --no-fund --unsafe-perm \
+    node-red@4.1.4 \
+    ws \
     && npm cache clean --force
 
 COPY . /addon
