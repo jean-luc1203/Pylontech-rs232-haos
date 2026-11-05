@@ -1,3 +1,14 @@
+## 2.0.4
+
+### Changed
+- Premium licenses now use the SmartPhoton `SPV2` format, as on the JK-BMS add-on. Old `SVP|` keys are no longer accepted.
+
+### Security
+- The license secret is removed from the flow.
+
+### Fixed
+- The system MQTT Discovery is sent after the broker connection and repeated every 5 minutes.
+
 ## 2.0.3
 
 ### Fixed

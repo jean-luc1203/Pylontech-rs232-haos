@@ -1,6 +1,6 @@
 ---
 name: "Pylontech RS232 HAOS"
-version: "2.0.3"
+version: "2.0.4"
 slug: pylontech_rs232_haos
 description: Pylontech US2000C/US3000/US5000/Pelio management via RS232 console or TCP/IP gateway
 url: https://github.com/jean-luc1203/Pylontech-rs232-haos
