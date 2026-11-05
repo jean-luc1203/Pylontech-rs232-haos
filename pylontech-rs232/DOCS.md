@@ -82,6 +82,10 @@ A license key is tied to the install ID of your add-on. You will find this ID:
 
 Provide this ID to get your key, then paste the key into `premium_license` and restart the add-on.
 
+Keys use the SmartPhoton `SPV2` format, as on the JK-BMS add-on, and are issued for the `smartphoton-pylontech` product. A JK-BMS key does not work here. Old keys starting with `SVP|` are no longer accepted.
+
+The result is shown in the **Premium status** sensor: `valid` when the key is accepted. `install_id_mismatch` means the key was created for another installation, and `invalid_product` that it was created for another module.
+
 ## Dashboards
 
 With a premium license, the add-on publishes two dashboards in the sidebar:
