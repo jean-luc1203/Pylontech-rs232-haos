@@ -1,6 +1,6 @@
 ---
 name: "Pylontech RS232 HAOS"
-version: "2.0.5"
+version: "2.0.6"
 slug: pylontech_rs232_haos
 description: Pylontech US2000C/US3000/US5000/Pelio management via RS232 console or TCP/IP gateway
 url: https://github.com/jean-luc1203/Pylontech-rs232-haos
@@ -49,7 +49,6 @@ options:
   # 🎨 DASHBOARD
   # ============================================================
   dashboard_section: "────────── DASHBOARD ──────────"
-  dashboard_custom_cards_installed: false
   dashboard_language: "fr"
 
 schema:
@@ -71,5 +70,4 @@ schema:
   premium_license: str?
 
   dashboard_section: str?
-  dashboard_custom_cards_installed: bool
   dashboard_language: list(fr|en)

@@ -16,7 +16,7 @@ and Send all data to Home assistant OS and to an MQTT broker.
 - Node-RED integrated
 - RS232 console port or TCP/IP gateway
 - Automatic detection of packs and battery model
-- Native and HTML dashboards (premium), in French and English
+- HTML dashboard (premium), in French and English
 
 # Installation
 

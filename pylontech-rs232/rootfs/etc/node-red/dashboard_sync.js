@@ -191,26 +191,28 @@ async function createOrUpdateDashboard() {
 }
 
 async function deleteDashboard() {
-  try {
-    await call("lovelace/config/delete", {
-      url_path: urlPath
-    });
+  fs.rmSync(filePath, { force: true });
 
+  // lovelace/config/delete would leave an empty entry in the sidebar.
+  const dashboards = await call("lovelace/dashboards/list");
+  const dashboard = (dashboards || []).find((item) => item.url_path === urlPath);
+
+  if (!dashboard) {
     return {
-      deleted: true,
+      deleted: false,
+      already_missing: true,
       file: filePath
     };
-  } catch (err) {
-    if (isDashboardMissingError(err)) {
-      return {
-        deleted: false,
-        already_missing: true,
-        file: filePath
-      };
-    }
-
-    throw err;
   }
+
+  await call("lovelace/dashboards/delete", {
+    dashboard_id: dashboard.id
+  });
+
+  return {
+    deleted: true,
+    file: filePath
+  };
 }
 
 function getEventData(event) {

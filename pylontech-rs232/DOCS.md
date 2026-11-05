@@ -27,7 +27,6 @@ The batteries appear under **Settings > Devices > MQTT** after the first detecti
 | `mqtt_base_topic` | Topic root. Default `pylontech1`. Changing it creates new entities. |
 | `Send_bip` | Anonymous start-up beep. |
 | `premium_license` | Premium license key, if you have one. |
-| `dashboard_custom_cards_installed` | Custom cards are installed in Home Assistant. |
 | `dashboard_language` | `fr` or `en`. |
 
 ### YAML example
@@ -45,7 +44,6 @@ mqttpass: mqtt_password
 mqtt_base_topic: pylontech1
 Send_bip: true
 premium_license: ""
-dashboard_custom_cards_installed: false
 dashboard_language: fr
 ```
 
@@ -88,10 +86,9 @@ The result is shown in the **Premium status** sensor: `valid` when the key is ac
 
 ## Dashboards
 
-With a premium license, the add-on publishes two dashboards in the sidebar:
+With a premium license, the add-on publishes the **Smart Pylontech HTML** dashboard in the sidebar. It is stored in `/config/www/smart-modular-dashboard/pylontech.html`, and also appears in the shared SmartPhoton menu when `index.html` already exists in that folder.
 
-- **Smart Pylontech**: native Home Assistant dashboard.
-- **Smart Pylontech HTML**: HTML dashboard stored in `/config/www/smart-modular-dashboard/pylontech.html`. It also appears in the shared SmartPhoton menu when `index.html` already exists in that folder.
+The former **Smart Pylontech Premium** dashboard is no longer provided: it is removed automatically at start-up, with any change you made to it.
 
 ## Files
 

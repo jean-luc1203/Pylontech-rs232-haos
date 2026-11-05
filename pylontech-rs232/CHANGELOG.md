@@ -1,3 +1,12 @@
+## 2.0.6
+
+### Removed
+- The former **Smart Pylontech Premium** dashboard: only the HTML dashboard is kept. It is removed from Home Assistant at start-up.
+- The `dashboard_custom_cards_installed` option, which only served that dashboard.
+
+### Fixed
+- English translation of the dashboard state tab.
+
 ## 2.0.5
 
 ### Changed

@@ -42,9 +42,6 @@ configuration:
   dashboard_section:
     name: "🎨 Dashboard"
     description: "Visual separator, do not change."
-  dashboard_custom_cards_installed:
-    name: "🎨 Dashboard → Custom cards installed"
-    description: "Enable if the dashboard custom cards are installed in Home Assistant."
   dashboard_language:
     name: "🎨 Dashboard → Language"
     description: "Dashboard language: fr or en."
