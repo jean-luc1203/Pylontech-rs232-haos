@@ -1,3 +1,8 @@
+## 2.0.3
+
+### Fixed
+- The premium install ID is shown in the add-on log at start-up (missing from 2.0.2).
+
 ## 2.0.2
 
 ### Fixed

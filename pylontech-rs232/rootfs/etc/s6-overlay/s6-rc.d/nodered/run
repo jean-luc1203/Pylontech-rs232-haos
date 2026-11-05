@@ -8,6 +8,7 @@ export NODE_PATH=/opt/node_modules
 PYLONTECH_RS232_INSTALL_ID="$(tr -d '\n\r' < /data/pylontech_rs232_install_id)"
 export PYLONTECH_RS232_INSTALL_ID
 export SMARTPHOTON_INSTALL_ID="${PYLONTECH_RS232_INSTALL_ID}"
+bashio::log.info "Premium install_id=${PYLONTECH_RS232_INSTALL_ID}"
 
 cd /opt || bashio::exit.nok "Could not change directory to Node-RED"
 
