@@ -1,3 +1,10 @@
+## 2.0.1
+
+### Fixed
+- Docker build: `musl` is upgraded before installing the build tools.
+- MQTT: the add-on credentials are now used to connect to the broker.
+- MQTT Discovery: unique IDs, device identifiers and object IDs no longer contain the `/` of the base topic.
+
 ## 2.0.0
 
 ### Changed

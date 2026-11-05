@@ -29,7 +29,7 @@ configuration:
     description: "Password associated with the MQTT user."
   mqtt_base_topic:
     name: "🚩 MQTT → Base topic"
-    description: "Root of the published topics. Use pylontech/2 for a second battery bank."
+    description: "Root of the published topics."
   Send_bip:
     name: "📊 Add-on usage"
     description: "Enable a beep to be sent at start-up. No private data is transmitted. Processing complies with the GDPR."
