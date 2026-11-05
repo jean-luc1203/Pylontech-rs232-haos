@@ -8,13 +8,19 @@ WORKDIR /opt
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
-RUN apk add --no-cache \
-        nodejs \
-        npm \
+# The base image pins musl: it must be upgraded before build-base can pull musl-dev
+RUN apk update \
+    && apk add --no-cache --upgrade \
+        musl \
+        musl-utils \
+        musl-dev \
     && apk add --no-cache --virtual .build-dependencies \
         build-base \
         linux-headers \
         python3 \
+    && apk add --no-cache \
+        nodejs \
+        npm \
     && npm install \
         --no-audit \
         --no-fund \
