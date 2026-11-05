@@ -11,7 +11,7 @@ This module will enable you to connect Pylontech via the console port (rj45 - rs
 of the  master battery (type US2000c-3000-5000 & Pelio)
 and Send all data to Home assistant OS and to an MQTT broker.
 
-- Publication of MQTT topics : `pylontech/<number>/battery/<pack>/state`
+- Publication of MQTT topics : `pylontech1/battery/<pack>/state`
 - Autodiscovery into Home Assistant
 - Node-RED integrated
 - RS232 console port or TCP/IP gateway

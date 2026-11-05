@@ -1,3 +1,8 @@
+## 2.0.5
+
+### Changed
+- The default base topic is back to `pylontech1`: existing entities and dashboards are kept.
+
 ## 2.0.4
 
 ### Changed
@@ -34,7 +39,6 @@
 ### Changed
 - Add-on rebuilt on the JK-BMS model: s6 services, `config.yaml` + `build.yaml`, Node-RED and its nodes installed in the image.
 - New Node-RED flow validated in the field: TCP gateway, automatic model detection, richer MQTT Discovery.
-- Default base topic is now `pylontech/1` (was `pylontech1`).
 - Node-RED data moved to `/config/smartphoton_pylontech/`.
 
 ### Added
@@ -47,5 +51,4 @@
 
 ### Breaking changes
 - Option names changed: the configuration must be filled in again.
-- Entity unique IDs change with the base topic: new entities are created and the old ones must be removed by hand.
 - 32-bit architectures (armv7, armhf, i386) are no longer supported.

@@ -24,7 +24,7 @@ The batteries appear under **Settings > Devices > MQTT** after the first detecti
 | `communication_debug` | Detailed communication logs. |
 | `mqttadresse_port` | Broker address and port. Default `core-mosquitto:1883`. |
 | `mqttuser`, `mqttpass` | MQTT credentials. |
-| `mqtt_base_topic` | Topic root. Default `pylontech/1`. |
+| `mqtt_base_topic` | Topic root. Default `pylontech1`. Changing it creates new entities. |
 | `Send_bip` | Anonymous start-up beep. |
 | `premium_license` | Premium license key, if you have one. |
 | `dashboard_custom_cards_installed` | Custom cards are installed in Home Assistant. |
@@ -42,7 +42,7 @@ communication_debug: false
 mqttadresse_port: core-mosquitto:1883
 mqttuser: mqtt_user
 mqttpass: mqtt_password
-mqtt_base_topic: pylontech/1
+mqtt_base_topic: pylontech1
 Send_bip: true
 premium_license: ""
 dashboard_custom_cards_installed: false
@@ -57,18 +57,18 @@ The editor has no password: keep this port on your local network and never expos
 
 ## MQTT topics
 
-With the default base topic `pylontech/1`:
+With the default base topic `pylontech1`:
 
 | Topic | Content |
 | --- | --- |
-| `pylontech/1/status` | Availability (`online` / `offline`) |
-| `pylontech/1/bank/state` | Bank aggregates |
-| `pylontech/1/battery/<NN>/state` | Pack state |
-| `pylontech/1/battery/<NN>/stat` | Cycles, SOH and statuses |
-| `pylontech/1/battery/<NN>/info` | Pack information |
-| `pylontech/1/battery/<NN>/cell/<CC>/state` | Cell state |
-| `pylontech/1/system/model` | Detected model |
-| `pylontech/1/health/transport` | Serial or gateway link health |
+| `pylontech1/status` | Availability (`online` / `offline`) |
+| `pylontech1/bank/state` | Bank aggregates |
+| `pylontech1/battery/<NN>/state` | Pack state |
+| `pylontech1/battery/<NN>/stat` | Cycles, SOH and statuses |
+| `pylontech1/battery/<NN>/info` | Pack information |
+| `pylontech1/battery/<NN>/cell/<CC>/state` | Cell state |
+| `pylontech1/system/model` | Detected model |
+| `pylontech1/health/transport` | Serial or gateway link health |
 
 Home Assistant devices are named `Pylontech Battery Bank` and `Pylontech Battery <n>`.
 
@@ -77,8 +77,8 @@ Home Assistant devices are named `Pylontech Battery Bank` and `Pylontech Battery
 A license key is tied to the install ID of your add-on. You will find this ID:
 
 - in the add-on log, on the line `Premium install_id=...` at each start;
-- in the **Install ID** sensor of the `pylontech_1 System` device, under **Diagnostic**;
-- in the MQTT topic `pylontech/1/system/info`.
+- in the **Install ID** sensor of the `pylontech1 System` device, under **Diagnostic**;
+- in the MQTT topic `pylontech1/system/info`.
 
 Provide this ID to get your key, then paste the key into `premium_license` and restart the add-on.
 
@@ -102,7 +102,7 @@ With a premium license, the add-on publishes two dashboards in the sidebar:
 ## Updating from 1.x
 
 - Option names changed: fill in the **Configuration** tab again.
-- The default base topic moves from `pylontech1` to `pylontech/1`, which also changes the entity unique IDs. New entities are created, and the old ones must be removed by hand. Your automations may need updating.
+- Keep `mqtt_base_topic` set to `pylontech1` (the default): changing it changes the entity unique IDs, which creates new entities.
 - 32-bit systems (armv7, armhf, i386) are no longer supported.
 
 ## Safety
