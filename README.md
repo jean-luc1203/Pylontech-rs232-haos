@@ -11,6 +11,19 @@ This module will enable you to connect Pylontech via the console port (rj45 - rs
 of the  master battery (type US2000c-3000-5000 & Pelio)
 and Send all data to Home assistant OS and to an MQTT broker.
 
-- Publication of MQTT topics : `pylontech/<number>/state`
+- Publication of MQTT topics : `pylontech/<number>/battery/<pack>/state`
 - Autodiscovery into Home Assistant
 - Node-RED integrated
+- RS232 console port or TCP/IP gateway
+- Automatic detection of packs and battery model
+- Native and HTML dashboards (premium), in French and English
+
+# Installation
+
+Add `https://github.com/jean-luc1203/Pylontech-rs232-haos` to the add-on repositories of Home Assistant, then install **Pylontech RS232 HAOS**.
+
+- [Documentation](pylontech-rs232/DOCS.md)
+- [Changelog](pylontech-rs232/CHANGELOG.md)
+- [Safety](pylontech-rs232/SAFETY.md)
+
+This add-on is part of the SmartPhoton ecosystem, with the [JK-BMS add-on](https://github.com/jean-luc1203/jkbms-rs485-addon).
