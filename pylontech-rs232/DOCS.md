@@ -72,6 +72,16 @@ With the default base topic `pylontech/1`:
 
 Home Assistant devices are named `Pylontech Battery Bank` and `Pylontech Battery <n>`.
 
+## Premium license
+
+A license key is tied to the install ID of your add-on. You will find this ID:
+
+- in the add-on log, on the line `Premium install_id=...` at each start;
+- in the **Install ID** sensor of the `pylontech_1 System` device, under **Diagnostic**;
+- in the MQTT topic `pylontech/1/system/info`.
+
+Provide this ID to get your key, then paste the key into `premium_license` and restart the add-on.
+
 ## Dashboards
 
 With a premium license, the add-on publishes two dashboards in the sidebar:

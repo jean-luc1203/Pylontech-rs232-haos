@@ -1,3 +1,11 @@
+## 2.0.2
+
+### Fixed
+- The premium install ID is shown again in the add-on log at start-up.
+
+### Added
+- `DOCS.md`: where to find the install ID for a premium license.
+
 ## 2.0.1
 
 ### Fixed
