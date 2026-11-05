@@ -86,12 +86,15 @@
             "7d38e4c7d7543397",
             "777440a8189b877e",
             "e5b1e07a428c0db7",
-            "e6f87ed15f200400"
+            "e6f87ed15f200400",
+            "c0a1d2e3f4050601",
+            "c0a1d2e3f4050602",
+            "c0a1d2e3f4050603"
         ],
         "x": 34,
         "y": 71.5,
         "w": 1212,
-        "h": 217
+        "h": 340
     },
     {
         "id": "d43658f1ba131882",
@@ -1179,7 +1182,8 @@
         "y": 180,
         "wires": [
             [
-                "9c70d78c08de731c"
+                "9c70d78c08de731c",
+                "c0a1d2e3f4050601"
             ]
         ]
     },
@@ -2899,6 +2903,68 @@
             [
                 "bfc559bbb73e943d"
             ]
+        ]
+    },
+    {
+        "id": "c0a1d2e3f4050601",
+        "type": "function",
+        "z": "e2d3eb10f92611d8",
+        "g": "e0ad64b3a1e83f9a",
+        "name": "BUILD HTML DASHBOARD PYLONTECH",
+        "func": "const premiumActive = global.get(\"premium.active\") === true;\nif (!premiumActive) return null;\n\nconst fs = global.get(\"fs\");\nconst dir = \"/config/www/smart-modular-dashboard\";\nconst lang = String(global.get(\"config.dashboardLanguage\") || \"fr\").toLowerCase() === \"en\" ? \"en\" : \"fr\";\n\ntry {\n    fs.mkdirSync(dir, { recursive: true });\n    fs.copyFileSync(\"/etc/node-red/pylontech.html\", dir + \"/pylontech.html\");\n\n    // Menu SmartPhoton : ajoute Pylontech a l'index partage s'il existe deja.\n    const indexPath = dir + \"/index.html\";\n    if (fs.existsSync(indexPath)) {\n        const html = fs.readFileSync(indexPath, \"utf8\");\n        const patched = html.replace(/const\\s+modules\\s*=\\s*\\[/, (m) => m + \"\\n{id:'pylontech', label:'Pylontech', url:'pylontech.html'},\");\n        if (!/pylontech\\.html/.test(html) && patched !== html) fs.writeFileSync(indexPath, patched);\n    }\n} catch (e) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"deploiement HTML impossible\" });\n    node.error(\"Deploiement du dashboard HTML impossible: \" + e.message, msg);\n    return null;\n}\n\nconst title = \"Smart Pylontech HTML\";\nconst url = \"/local/smart-modular-dashboard/pylontech.html?lang=\" + lang + \"&v=\" + Date.now();\nmsg.filename = \"/config/dashboards/smart_pylontech_html.json\";\nmsg.payload = JSON.stringify({\n    dashboard_meta: { url_path: \"smart-pylontech-html\", title, icon: \"mdi:battery-high\", show_in_sidebar: true, require_admin: false },\n    config: { views: [{ title, path: \"home\", icon: \"mdi:battery-high\", panel: true, cards: [{ type: \"iframe\", url, aspect_ratio: \"100%\" }] }] }\n}, null, 2);\nnode.status({ fill: \"green\", shape: \"dot\", text: \"dashboard HTML pret / lang=\" + lang });\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 320,
+        "wires": [
+            [
+                "c0a1d2e3f4050602"
+            ]
+        ]
+    },
+    {
+        "id": "c0a1d2e3f4050602",
+        "type": "file",
+        "z": "e2d3eb10f92611d8",
+        "g": "e0ad64b3a1e83f9a",
+        "name": "dashboard html",
+        "filename": "filename",
+        "filenameType": "msg",
+        "appendNewline": false,
+        "createDir": true,
+        "overwriteFile": "true",
+        "encoding": "utf8",
+        "x": 840,
+        "y": 320,
+        "wires": [
+            [
+                "c0a1d2e3f4050603"
+            ]
+        ]
+    },
+    {
+        "id": "c0a1d2e3f4050603",
+        "type": "exec",
+        "z": "e2d3eb10f92611d8",
+        "g": "e0ad64b3a1e83f9a",
+        "command": "node /etc/node-red/dashboard_sync.js upsert /config/dashboards/smart_pylontech_html.json",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "EXEC DASHBOARD HTML SCRIPT",
+        "x": 1110,
+        "y": 320,
+        "wires": [
+            [],
+            [],
+            []
         ]
     }
 ]
