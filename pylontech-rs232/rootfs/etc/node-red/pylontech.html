@@ -985,6 +985,7 @@ body.module-pylontech .pylon-side-card{max-width:100%!important;min-width:0!impo
 }
 
 </style>
+<style>body.module-pylontech #jkbms .card.pylon-missing{display:none}</style>
 </head>
 <body class="module-pylontech">
 <div class="app"><div class="shell">
@@ -1672,9 +1673,6 @@ setTimeout(()=>renderDashboard(true),100);
       else if(/Batterie [0-9]|SOC moyen ·/.test(key))n.nodeValue=n.nodeValue.replace('Batterie','Battery').replace('non détectée','not detected').replace('SOC moyen','Average SOC');
     }
   }
-  const style=document.createElement('style');
-  style.textContent="body.module-pylontech #jkbms .card.pylon-missing::after{content:\"Entity missing\"}";
-  document.head.appendChild(style);
   translate(document.body);
   new MutationObserver(()=>translate(document.body)).observe(document.body,{childList:true,subtree:true});
 })();

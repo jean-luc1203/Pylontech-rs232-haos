@@ -1,3 +1,11 @@
+## 2.0.7
+
+### Fixed
+- US2000B: the date of the `pwr` table is no longer read as the Coulomb status, which showed a false alarm.
+
+### Changed
+- HTML dashboard: cards whose entity does not exist are hidden.
+
 ## 2.0.6
 
 ### Removed
