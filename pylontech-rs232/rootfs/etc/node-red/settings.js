@@ -1,8 +1,10 @@
+const fs = require("fs");
+
 module.exports = {
     /* --------------------------------------------------
      * Node-RED UI
      * -------------------------------------------------- */
-    uiPort: process.env.PORT || 1893,
+    uiPort: 1893,
     uiHost: "0.0.0.0",
 
     /* --------------------------------------------------
@@ -22,14 +24,16 @@ module.exports = {
     },
 
     /* --------------------------------------------------
-     * Force correct flow file
+     * User directory, flow and credentials
      * -------------------------------------------------- */
-    flowFile: "/data/flows.json",
+    userDir: "/config/smartphoton_pylontech",
+    flowFile: "flows.json",
+    credentialSecret: fs.readFileSync("/data/credential_secret", "utf8").trim(),
 
     /* --------------------------------------------------
-     * Load extra nodes installed in image
+     * Extra nodes
      * -------------------------------------------------- */
-    nodesDir: "/opt/node_modules",
+    nodesDir: "/config/smartphoton_pylontech/nodes",
 
     /* --------------------------------------------------
      * Logging
@@ -61,6 +65,7 @@ module.exports = {
 
     functionGlobalContext: {
         crypto: require("crypto"),
+        net: require("net"),
         fs: require("fs"),
         path: require("path"),
         os: require("os"),
@@ -123,7 +128,7 @@ module.exports = {
     /* --------------------------------------------------
      * Flow formatting
      * -------------------------------------------------- */
-    flowFilePretty: false,
+    flowFilePretty: true,
 
     /* --------------------------------------------------
      * Buffer

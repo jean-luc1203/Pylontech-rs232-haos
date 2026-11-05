@@ -1,21 +1,51 @@
-ARG BUILD_FROM=ghcr.io/hassio-addons/base-nodejs:0.2.1
+ARG BUILD_FROM=ghcr.io/hassio-addons/base:stable
+# hadolint ignore=DL3006
 FROM ${BUILD_FROM}
+
+COPY package.json /opt/
+
+WORKDIR /opt
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN apk add --no-cache \
-    bash \
-    jq \
-    tzdata
+        nodejs \
+        npm \
+    && apk add --no-cache --virtual .build-dependencies \
+        build-base \
+        linux-headers \
+        python3 \
+    && npm install \
+        --no-audit \
+        --no-fund \
+        --no-update-notifier \
+        --omit=dev \
+        --unsafe-perm \
+    && npm rebuild --build-from-source @serialport/bindings-cpp \
+    && npm cache clear --force \
+    && apk del --no-cache --purge .build-dependencies \
+    && rm -rf /root/.cache /root/.npm /tmp/*
 
-RUN npm install -g --no-audit --no-fund --unsafe-perm node-red@4.1.4 \
-    && npm cache clean --force
+COPY rootfs /
 
-COPY . /addon
-WORKDIR /addon
+RUN chmod +x \
+    /etc/s6-overlay/s6-rc.d/init-nodered/run \
+    /etc/s6-overlay/s6-rc.d/nodered/run \
+    /etc/s6-overlay/s6-rc.d/nodered/finish
 
-RUN npm init -y >/dev/null 2>&1 || true \
-    && npm install --no-audit --no-fund --unsafe-perm ws \
-    && chmod a+x /addon/run.sh
+HEALTHCHECK --start-period=10m \
+    CMD curl --fail http://127.0.0.1:1893 || exit 1
 
-ENTRYPOINT ["/addon/run.sh"]
+ARG BUILD_ARCH
+ARG BUILD_DESCRIPTION
+ARG BUILD_NAME
+ARG BUILD_VERSION
+
+ENV VERSION=${BUILD_VERSION}
+
+LABEL \
+    io.hass.name="${BUILD_NAME}" \
+    io.hass.description="${BUILD_DESCRIPTION}" \
+    io.hass.arch="${BUILD_ARCH}" \
+    io.hass.type="addon" \
+    io.hass.version=${BUILD_VERSION}
