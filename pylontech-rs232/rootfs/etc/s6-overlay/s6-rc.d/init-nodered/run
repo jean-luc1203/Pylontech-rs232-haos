@@ -1,0 +1,29 @@
+#!/command/with-contenv bashio
+# shellcheck shell=bash
+# ==============================================================================
+# Pylontech RS232 add-on
+# Prepares the Node-RED user directory before start
+# ==============================================================================
+readonly USER_DIR=/config/smartphoton_pylontech
+readonly INSTALL_ID_FILE=/data/pylontech_rs232_install_id
+readonly SECRET_FILE=/data/credential_secret
+
+mkdir -p "${USER_DIR}/nodes" /config/dashboards /config/www/smart-modular-dashboard /share/pylontech \
+    || bashio::exit.nok "Failed to create add-on directories"
+
+# As on JK-BMS, the flow shipped in the image always wins: the previous one is kept as a backup.
+if bashio::fs.file_exists "${USER_DIR}/flows.json"; then
+    mv "${USER_DIR}/flows.json" "${USER_DIR}/flows.backup"
+fi
+cp /etc/node-red/flows.json "${USER_DIR}/flows.json" \
+    || bashio::exit.nok "Failed to install flows.json"
+
+# Same file as the previous add-on versions, so existing premium licences stay bound.
+if [[ ! -s "${INSTALL_ID_FILE}" ]]; then
+    tr -d '-' < /proc/sys/kernel/random/uuid > "${INSTALL_ID_FILE}"
+    bashio::log.info "Premium: new install_id generated"
+fi
+
+if [[ ! -s "${SECRET_FILE}" ]]; then
+    tr -d '-' < /proc/sys/kernel/random/uuid > "${SECRET_FILE}"
+fi
