@@ -1,3 +1,11 @@
+## 2.0.9
+
+### Changed
+- HTML dashboard on phones: larger text, two columns, no repeated bank values, cell detail moved to each battery tab.
+
+### Removed
+- The Pylontech entry added to the shared SmartPhoton menu.
+
 ## 2.0.8
 
 ### Removed
@@ -68,7 +76,7 @@
 
 ### Added
 - `packs_count` option (`0` = automatic detection).
-- HTML dashboard (premium), in French and English, deployed to `/config/www/smart-modular-dashboard/` and added to the shared SmartPhoton menu.
+- HTML dashboard (premium), in French and English, deployed to `/config/www/smart-modular-dashboard/`.
 - `DOCS.md`, `SAFETY.md`, French and English translations of the options.
 
 ### Fixed

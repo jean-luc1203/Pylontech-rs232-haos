@@ -985,7 +985,26 @@ body.module-pylontech .pylon-side-card{max-width:100%!important;min-width:0!impo
 }
 
 </style>
-<style>body.module-pylontech #jkbms .card.pylon-missing{display:none}</style>
+<style>
+body.module-pylontech #jkbms .card.pylon-missing{display:none}
+@media(max-width:760px){
+  body.module-pylontech #jkbms .label,
+  body.module-pylontech #jkbms .small,
+  body.module-pylontech #jkbms .soc-battery-label{font-size:12px!important;line-height:1.3!important;letter-spacing:.02em!important}
+  body.module-pylontech #jkbms .value{font-size:20px!important;line-height:1.2!important;overflow-wrap:anywhere}
+  body.module-pylontech #bms_summary,
+  body.module-pylontech #jkbms .cards4,
+  body.module-pylontech #jkbms .diag-wow{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  /* Ces valeurs sont deja dans le resume en haut de page. */
+  body.module-pylontech #jkbms .pylon-bank-hero>.cards4{display:none!important}
+  /* Detail des cellules : disponible dans l'onglet de chaque batterie. */
+  body.module-pylontech #jkbms .bms-wall .bms-cells{display:none!important}
+  body.module-pylontech #jkbms .bms-subnav{flex-wrap:nowrap!important;overflow-x:auto!important}
+  body.module-pylontech #jkbms .bms-detail-nav{flex-wrap:wrap!important;overflow:visible!important}
+  body.module-pylontech #jkbms .bms-subtab,
+  body.module-pylontech #jkbms .bms-detail-tab{font-size:14px!important;min-height:44px!important;flex:0 0 auto!important}
+}
+</style>
 </head>
 <body class="module-pylontech">
 <div class="app"><div class="shell">
