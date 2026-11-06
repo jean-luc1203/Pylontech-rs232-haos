@@ -3,9 +3,6 @@ configuration:
   pylontech_path:
     name: "🟪 Pylontech → Chemin du port série"
     description: "Chemin by-id du port série relié au port console de la batterie maître (Menu : Paramètres-Matériel-Tout le matériel)."
-  baudrate:
-    name: "🟪 Pylontech → Vitesse du port série"
-    description: "Vitesse du port console. Valeur usuelle : 115200."
   packs_count:
     name: "🟪 Pylontech → Nombre de packs"
     description: "Nombre de packs à interroger (1 à 15). 0 = détection automatique."

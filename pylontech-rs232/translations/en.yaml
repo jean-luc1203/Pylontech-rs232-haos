@@ -3,9 +3,6 @@ configuration:
   pylontech_path:
     name: "🟪 Pylontech → Serial port path"
     description: "by-id path of the serial port wired to the console port of the master battery (Menu: Settings-Hardware-All hardware)."
-  baudrate:
-    name: "🟪 Pylontech → Serial port speed"
-    description: "Console port speed. Usual value: 115200."
   packs_count:
     name: "🟪 Pylontech → Number of packs"
     description: "Number of packs to poll (1 to 15). 0 = automatic detection."

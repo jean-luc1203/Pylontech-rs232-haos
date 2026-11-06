@@ -17,7 +17,6 @@ The batteries appear under **Settings > Devices > MQTT** after the first detecti
 | Option | Description |
 | --- | --- |
 | `pylontech_path` | by-id path of the serial adapter, e.g. `/dev/serial/by-id/usb-xxxx`. Not used in gateway mode. |
-| `baudrate` | Console port speed. Default `115200`. |
 | `packs_count` | Packs to poll, 1 to 15. `0` (default) detects them automatically. |
 | `use_gateway` | Use a TCP gateway instead of the local serial port. |
 | `gateway_ip_port` | Gateway address, e.g. `192.168.1.100:5000`. |
@@ -33,7 +32,6 @@ The batteries appear under **Settings > Devices > MQTT** after the first detecti
 
 ```yaml
 pylontech_path: /dev/serial/by-id/usb-xxxx_USB_Serial-abcdefghij
-baudrate: "115200"
 packs_count: 0
 use_gateway: false
 gateway_ip_port: ""
@@ -46,6 +44,8 @@ Send_bip: true
 premium_license: ""
 dashboard_language: fr
 ```
+
+The console port is read at 115200 bauds, 8N1. US2000B and US2000 Plus batteries start at 1200 bauds: see [Preparing a US2000B or US2000 Plus](../README.md#preparing-a-us2000b-or-us2000-plus).
 
 ## Node-RED
 

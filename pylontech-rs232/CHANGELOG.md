@@ -1,3 +1,11 @@
+## 2.0.8
+
+### Removed
+- The `baudrate` option: the console port always runs at 115200 bauds.
+
+### Added
+- `README.md`: how to prepare the console port of US2000B and US2000 Plus batteries.
+
 ## 2.0.7
 
 ### Fixed
@@ -59,7 +67,7 @@
 - Node-RED data moved to `/config/smartphoton_pylontech/`.
 
 ### Added
-- `baudrate` and `packs_count` options (`0` = automatic detection).
+- `packs_count` option (`0` = automatic detection).
 - HTML dashboard (premium), in French and English, deployed to `/config/www/smart-modular-dashboard/` and added to the shared SmartPhoton menu.
 - `DOCS.md`, `SAFETY.md`, French and English translations of the options.
 
@@ -67,5 +75,5 @@
 - The base topic is applied to every node of the flow.
 
 ### Breaking changes
-- Option names changed: the configuration must be filled in again.
+- Option names changed: write down your settings before updating, then fill in the configuration again.
 - 32-bit architectures (armv7, armhf, i386) are no longer supported.

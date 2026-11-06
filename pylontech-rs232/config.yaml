@@ -1,6 +1,6 @@
 ---
 name: "Pylontech RS232 HAOS"
-version: "2.0.7"
+version: "2.0.8"
 slug: pylontech_rs232_haos
 description: Pylontech US2000C/US3000/US5000/Pelio management via RS232 console or TCP/IP gateway
 url: https://github.com/jean-luc1203/Pylontech-rs232-haos
@@ -24,7 +24,6 @@ map:
 options:
   # Pylontech configuration
   pylontech_path: "/dev/serial/by-id/usb-xxxx_USB_Serial-abcdefghij"
-  baudrate: "115200"
   packs_count: 0
   use_gateway: false
   gateway_ip_port: ""
@@ -53,7 +52,6 @@ options:
 
 schema:
   pylontech_path: str?
-  baudrate: list(1200|2400|4800|9600|19200|38400|57600|115200)
   packs_count: int(0,15)
   use_gateway: bool
   gateway_ip_port: str?
