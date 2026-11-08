@@ -49,9 +49,9 @@ The console port is read at 115200 bauds, 8N1. US2000B and US2000 Plus batteries
 
 ## Node-RED
 
-The editor is available on port `1893`. The flow shipped with the add-on replaces `/config/smartphoton_pylontech/flows.json` at every start: changes made in the editor are lost, and the previous flow is kept as `flows.backup`.
+The Node-RED editor is reserved for the add-on maintainers. It is not exposed on the network: it only opens from Home Assistant, with **Open web UI**, and then asks for a maintainer login. Users do not need it.
 
-The editor has no password: keep this port on your local network and never expose it to the internet.
+The flow shipped with the add-on replaces `/config/smartphoton_pylontech/flows.json` at every start: changes made in the editor are lost, and the previous flow is kept as `flows.backup`.
 
 ## MQTT topics
 

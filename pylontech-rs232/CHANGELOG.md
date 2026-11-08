@@ -1,3 +1,8 @@
+## 2.1.0
+
+### Security
+- The Node-RED editor is no longer open on port 1893. It only opens through Home Assistant and asks for a maintainer login.
+
 ## 2.0.9
 
 ### Changed

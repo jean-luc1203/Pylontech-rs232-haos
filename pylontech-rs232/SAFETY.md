@@ -23,7 +23,7 @@ For real-world installations, users should keep:
 
 ## Network access
 
-The Node-RED editor on port 1893 has no password. Keep it on your local network and never expose it to the internet.
+The Node-RED editor is not exposed on the network. It only opens through Home Assistant and is reserved for the maintainers.
 
 ## Practical expectation
 

@@ -9,8 +9,17 @@ module.exports = {
 
     /* --------------------------------------------------
      * Security
+     * Editor reserved to the maintainers. Users without a hash cannot log in,
+     * so an empty list locks the editor for everyone.
+     * Hash a password with: npx node-red-admin hash-pw
      * -------------------------------------------------- */
-    adminAuth: null,
+    adminAuth: {
+        type: "credentials",
+        users: [
+            { username: "alexis", password: "", permissions: "*" },
+            { username: "jean-luc", password: "", permissions: "*" }
+        ].filter((user) => user.password)
+    },
     httpNodeAuth: null,
     httpStaticAuth: null,
 

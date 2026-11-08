@@ -1,6 +1,6 @@
 ---
 name: "Pylontech RS232 HAOS"
-version: "2.0.9"
+version: "2.1.0"
 slug: pylontech_rs232_haos
 description: Pylontech US2000C/US3000/US5000/Pelio management via RS232 console or TCP/IP gateway
 url: https://github.com/jean-luc1203/Pylontech-rs232-haos
@@ -11,10 +11,8 @@ init: false
 arch:
   - aarch64
   - amd64
-ports:
-  "1893/tcp": 1893
-ports_description:
-  "1893/tcp": Node-RED web interface
+ingress: true
+ingress_port: 1893
 homeassistant_api: true
 uart: true
 map:
