@@ -85,12 +85,13 @@
             "e6f87ed15f200400",
             "c0a1d2e3f4050601",
             "c0a1d2e3f4050602",
-            "c0a1d2e3f4050603"
+            "c0a1d2e3f4050603",
+            "c0a1d2e3f4050604"
         ],
         "x": 34,
         "y": 71.5,
         "w": 1212,
-        "h": 340
+        "h": 400
     },
     {
         "id": "d43658f1ba131882",
@@ -2823,8 +2824,8 @@
         "z": "e2d3eb10f92611d8",
         "g": "e0ad64b3a1e83f9a",
         "name": "BUILD HTML DASHBOARD PYLONTECH",
-        "func": "const premiumActive = global.get(\"premium.active\") === true;\nif (!premiumActive) return null;\n\nconst fs = global.get(\"fs\");\nconst dir = \"/config/www/smart-modular-dashboard\";\nconst lang = String(global.get(\"config.dashboardLanguage\") || \"fr\").toLowerCase() === \"en\" ? \"en\" : \"fr\";\n\ntry {\n    fs.mkdirSync(dir, { recursive: true });\n    fs.copyFileSync(\"/etc/node-red/pylontech.html\", dir + \"/pylontech.html\");\n} catch (e) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"deploiement HTML impossible\" });\n    node.error(\"Deploiement du dashboard HTML impossible: \" + e.message, msg);\n    return null;\n}\n\nconst title = \"Smart Pylontech HTML\";\nconst url = \"/local/smart-modular-dashboard/pylontech.html?lang=\" + lang + \"&v=\" + Date.now();\nmsg.filename = \"/config/dashboards/smart_pylontech_html.json\";\nmsg.payload = JSON.stringify({\n    dashboard_meta: { url_path: \"smart-pylontech-html\", title, icon: \"mdi:battery-high\", show_in_sidebar: true, require_admin: false },\n    config: { views: [{ title, path: \"home\", icon: \"mdi:battery-high\", panel: true, cards: [{ type: \"iframe\", url, aspect_ratio: \"100%\" }] }] }\n}, null, 2);\nnode.status({ fill: \"green\", shape: \"dot\", text: \"dashboard HTML pret / lang=\" + lang });\nreturn msg;\n",
-        "outputs": 1,
+        "func": "const fs = global.get(\"fs\");\nconst dir = \"/config/www/smart-modular-dashboard\";\n\n// Sans licence valide, le dashboard HTML est retire (fichier et entree de la barre laterale).\nif (global.get(\"premium.active\") !== true) {\n    try {\n        fs.rmSync(dir + \"/pylontech.html\", { force: true });\n    } catch (e) {\n        node.error(\"Suppression du dashboard HTML impossible: \" + e.message, msg);\n    }\n    node.status({ fill: \"grey\", shape: \"ring\", text: \"premium inactif : dashboard HTML retire\" });\n    return [null, { payload: \"delete\" }];\n}\nconst lang = String(global.get(\"config.dashboardLanguage\") || \"fr\").toLowerCase() === \"en\" ? \"en\" : \"fr\";\n\ntry {\n    fs.mkdirSync(dir, { recursive: true });\n    fs.copyFileSync(\"/etc/node-red/pylontech.html\", dir + \"/pylontech.html\");\n} catch (e) {\n    node.status({ fill: \"red\", shape: \"ring\", text: \"deploiement HTML impossible\" });\n    node.error(\"Deploiement du dashboard HTML impossible: \" + e.message, msg);\n    return null;\n}\n\nconst title = \"Smart Pylontech HTML\";\nconst url = \"/local/smart-modular-dashboard/pylontech.html?lang=\" + lang + \"&v=\" + Date.now();\nmsg.filename = \"/config/dashboards/smart_pylontech_html.json\";\nmsg.payload = JSON.stringify({\n    dashboard_meta: { url_path: \"smart-pylontech-html\", title, icon: \"mdi:battery-high\", show_in_sidebar: true, require_admin: false },\n    config: { views: [{ title, path: \"home\", icon: \"mdi:battery-high\", panel: true, cards: [{ type: \"iframe\", url, aspect_ratio: \"100%\" }] }] }\n}, null, 2);\nnode.status({ fill: \"green\", shape: \"dot\", text: \"dashboard HTML pret / lang=\" + lang });\nreturn [msg, null];\n",
+        "outputs": 2,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
@@ -2835,6 +2836,9 @@
         "wires": [
             [
                 "c0a1d2e3f4050602"
+            ],
+            [
+                "c0a1d2e3f4050604"
             ]
         ]
     },
@@ -2873,6 +2877,27 @@
         "name": "EXEC DASHBOARD HTML SCRIPT",
         "x": 1110,
         "y": 320,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "c0a1d2e3f4050604",
+        "type": "exec",
+        "z": "e2d3eb10f92611d8",
+        "g": "e0ad64b3a1e83f9a",
+        "command": "node /etc/node-red/dashboard_sync.js delete /config/dashboards/smart_pylontech_html.json",
+        "addpay": "",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "EXEC DELETE HTML",
+        "x": 1110,
+        "y": 380,
         "wires": [
             [],
             [],

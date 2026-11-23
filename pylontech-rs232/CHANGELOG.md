@@ -1,3 +1,8 @@
+## 2.1.2
+
+### Changed
+- Without a valid premium license, the HTML dashboard is removed at start-up.
+
 ## 2.1.1
 
 ### Changed

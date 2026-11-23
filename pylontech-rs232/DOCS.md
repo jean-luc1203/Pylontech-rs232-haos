@@ -86,7 +86,7 @@ The result is shown in the **Premium status** sensor: `valid` when the key is ac
 
 ## Dashboards
 
-With a premium license, the add-on publishes the **Smart Pylontech HTML** dashboard in the sidebar. It is stored in `/config/www/smart-modular-dashboard/pylontech.html`.
+With a premium license, the add-on publishes the **Smart Pylontech HTML** dashboard in the sidebar. Without a valid license, it is removed at the next start. It is stored in `/config/www/smart-modular-dashboard/pylontech.html`.
 
 The former **Smart Pylontech Premium** dashboard is no longer provided: it is removed automatically at start-up, with any change you made to it.
 
