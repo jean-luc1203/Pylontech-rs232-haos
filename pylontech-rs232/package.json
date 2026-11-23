@@ -1,0 +1,18 @@
+{
+  "private": true,
+  "name": "pylontech-rs232-haos",
+  "description": "Node-RED runtime of the Pylontech RS232 add-on",
+  "license": "MIT",
+  "main": "node_modules/node-red/red/red.js",
+  "scripts": {
+    "start": "node $NODE_OPTIONS node_modules/node-red/red.js"
+  },
+  "dependencies": {
+    "node-red": "4.1.4",
+    "node-red-node-serialport": "*",
+    "ws": "*"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

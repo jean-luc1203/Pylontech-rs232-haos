@@ -1,0 +1,1699 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Smart Energy Premium - Pylontech</title>
+<style>
+
+:root{
+  --bg:#050b16;--panel:rgba(7,15,30,.92);--card:rgba(12,23,43,.96);
+  --border:rgba(126,161,206,.22);--txt:#edf5ff;--muted:#91a7c4;
+  --solar:#ffc928;--load:#20c7ff;--bat:#21df69;--grid:#9b5cff;
+  --red:#ff5f7a;--orange:#ff9f43;--blue:#3aa6ff;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,Segoe UI,system-ui,sans-serif;color:var(--txt)}
+body{
+  background:
+    radial-gradient(circle at 20% 0%,rgba(255,201,40,.18),transparent 28%),
+    radial-gradient(circle at 88% 0%,rgba(46,199,255,.18),transparent 32%),
+    radial-gradient(circle at 50% 110%,rgba(36,224,109,.10),transparent 42%),
+    linear-gradient(135deg,#020617,#071326 55%,#03101f);
+}
+.app{min-height:100vh;padding:10px;display:grid;grid-template-rows:1fr auto;gap:8px}
+.shell{display:grid;grid-template-columns:190px 1fr;gap:10px;min-height:calc(100vh - 52px)}
+.sidebar{border-radius:22px;background:linear-gradient(180deg,rgba(11,23,43,.98),rgba(6,13,26,.96));border:1px solid var(--border);padding:14px;box-shadow:0 24px 80px rgba(0,0,0,.42)}
+.brand{display:flex;gap:10px;align-items:center;font-size:21px;font-weight:1000;line-height:1;margin-bottom:16px}
+.brand .bolt{color:var(--solar);font-size:29px}.premium{padding:12px;border-radius:15px;color:#c8ffd9;background:rgba(36,224,109,.12);border:1px solid rgba(36,224,109,.35);font-size:12px;font-weight:900;margin-bottom:18px}
+.nav{display:grid;gap:8px}.tab{border:1px solid transparent;background:transparent;color:#b8c7dd;padding:12px;border-radius:14px;text-align:left;font-weight:900;cursor:pointer;font-size:15px}
+.tab.active{background:linear-gradient(135deg,rgba(46,199,255,.23),rgba(46,199,255,.08));border-color:rgba(46,199,255,.56);color:#fff}
+.side-bottom{position:absolute;bottom:20px;font-size:12px;color:var(--muted)}
+.main{min-width:0}.topbar{height:56px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.left-title{display:flex;gap:10px;align-items:center}.left-title h1{margin:0;font-size:28px;letter-spacing:-1.5px}.premium-pill{padding:8px 13px;border-radius:999px;background:rgba(255,159,67,.16);border:1px solid rgba(255,159,67,.48);color:#ffd7a6;font-weight:1000;font-size:12px}
+.statusbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.pill{padding:9px 13px;border-radius:999px;background:rgba(15,25,45,.9);border:1px solid var(--border);font-weight:900;font-size:13px}.ok{color:#baffcf;border-color:rgba(36,224,109,.35);background:rgba(36,224,109,.13)}
+.view{display:none}.view.active{display:block}.dash-grid{display:grid;grid-template-columns:minmax(780px,1.38fr) minmax(420px,.62fr);gap:10px}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:12px;box-shadow:0 20px 70px rgba(0,0,0,.36);backdrop-filter:blur(14px)}
+.title{font-size:18px;font-weight:1000;text-transform:uppercase;letter-spacing:.2px;margin:0 0 10px;display:flex;align-items:center;gap:10px}.live{font-size:11px;color:#7cffad;background:rgba(36,224,109,.14);border:1px solid rgba(36,224,109,.33);padding:4px 8px;border-radius:999px}
+.flowbox{position:relative;height:680px;border-radius:18px;overflow:hidden;background:radial-gradient(circle at 50% 54%,rgba(46,199,255,.13),transparent 33%),linear-gradient(180deg,rgba(7,15,29,.86),rgba(5,11,22,.94));border:1px solid rgba(126,161,206,.14)}
+.flowbox:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(126,161,206,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(126,161,206,.055) 1px,transparent 1px);background-size:32px 32px;mask-image:radial-gradient(circle at center,black,transparent 82%)}
+.node{position:absolute;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:12px;z-index:5;box-shadow:0 18px 50px rgba(0,0,0,.36)}
+.node .ico{font-size:25px;margin-bottom:3px}.label{color:var(--muted);font-size:10px;font-weight:1000;text-transform:uppercase;letter-spacing:1.2px}.value{font-size:25px;font-weight:1000;letter-spacing:-1px;margin-top:4px}.small{color:var(--muted);font-size:11px;margin-top:4px}
+.solar{border-color:rgba(255,201,40,.55)}.load{border-color:rgba(46,199,255,.55)}.bat{border-color:rgba(36,224,109,.55)}.gridc{border-color:rgba(155,92,255,.55)}.orange{border-color:rgba(255,159,67,.55)}.red{border-color:rgba(255,95,122,.55)}
+.mppt{width:205px}.pv-array{width:48px;height:34px;margin-bottom:5px;display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:4px;border-radius:10px;background:linear-gradient(145deg,#0ea5e9,#1e3a8a 78%);border:1px solid rgba(125,211,252,.75);box-shadow:0 0 24px rgba(56,189,248,.42),inset 0 0 14px rgba(255,255,255,.10);transform:perspective(80px) rotateX(5deg)}.pv-array i{display:block;border-radius:3px;background:linear-gradient(145deg,rgba(224,242,254,.95),rgba(14,165,233,.35));border:1px solid rgba(186,230,253,.35)}.pv-array:after{content:attr(data-n);position:absolute;margin-left:37px;margin-top:-9px;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#0f172a;border:1px solid rgba(125,211,252,.75);color:#e0f7ff;font-size:13px;font-weight:1000}.alarm-siren{font-size:42px;filter:drop-shadow(0 0 18px rgba(239,68,68,.55));animation:sirenPulse 1.2s infinite alternate}.alarm-ok{filter:drop-shadow(0 0 18px rgba(34,197,94,.45));opacity:.65;animation:none}.info-tile:before,.diag-wow-card:before{content:attr(data-ico);position:absolute;right:12px;top:8px;font-size:22px;opacity:.28}@keyframes sirenPulse{from{transform:scale(1);opacity:.75}to{transform:scale(1.08);opacity:1}}.left1{left:18px;top:44px}.left2{left:18px;top:180px}.right1{right:18px;top:44px}.right2{right:18px;top:180px}
+.solar-total{left:50%;top:16px;transform:translateX(-50%);width:250px;text-align:center}.n-grid{left:18px;top:380px;width:205px}.n-load{right:18px;top:380px;width:220px}.n-bat{left:50%;bottom:8px;transform:translateX(-50%);width:300px;text-align:center}
+.inverter-core{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);width:225px;height:285px;border-radius:50%;background:radial-gradient(circle,rgba(46,199,255,.18),rgba(8,16,31,.95) 68%);border:1px solid rgba(46,199,255,.62);box-shadow:0 0 85px rgba(46,199,255,.20);z-index:4;display:flex;align-items:center;justify-content:center;text-align:center}
+.inverter-pic{width:94px;height:84px;margin:0 auto 8px;border-radius:10px;background:linear-gradient(180deg,#d7dde7,#9da7b4);border:1px solid rgba(255,255,255,.38);box-shadow:0 12px 30px rgba(0,0,0,.45);position:relative}
+.inverter-pic:before{content:"";position:absolute;left:28px;right:28px;top:18px;height:26px;border-radius:5px;background:#07111f;border:1px solid #64748b}.inverter-pic:after{content:"VOLTRONIC";position:absolute;bottom:8px;left:0;right:0;color:#111827;font-size:7px;font-weight:900}
+.screen{position:relative;color:#fff}.main-power{font-size:28px;font-weight:1000;letter-spacing:-1px}.core-extra{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:8px}.core-extra span{padding:5px 6px;border-radius:9px;background:rgba(15,25,45,.82);border:1px solid rgba(46,199,255,.22);font-size:11px;font-weight:900;color:#d9f4ff}.meta{color:#9fb2cc;font-size:11px;margin-top:4px}
+svg.flow{position:absolute;inset:0;width:100%;height:100%;z-index:2}.path{fill:none;stroke-width:7;stroke-linecap:round;opacity:.18;filter:drop-shadow(0 0 10px currentColor)}.pvpath{stroke:var(--solar);color:var(--solar)}.loadpath{stroke:var(--load);color:var(--load)}.batpath{stroke:var(--bat);color:var(--bat)}.gridpath{stroke:var(--grid);color:var(--grid);stroke-dasharray:14 16}.dot{fill:currentColor;filter:drop-shadow(0 0 12px currentColor)}
+.side-stack{display:grid;gap:10px}.cards2{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.cards4{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.cards5{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:11px;box-shadow:0 12px 35px rgba(0,0,0,.25)}.card .value{font-size:22px}
+.donut-row{display:grid;grid-template-columns:1fr 1.2fr;gap:10px;align-items:center}.donut-legend{display:grid;gap:10px}.legend-line{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid rgba(126,161,206,.10);padding-bottom:7px}.dot-legend{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:8px}.donut{width:160px;height:160px;border-radius:50%;margin:auto;display:flex;align-items:center;justify-content:center;box-shadow:0 0 45px rgba(46,199,255,.13)}.donut-inner{width:103px;height:103px;border-radius:50%;background:#0f172a;display:flex;align-items:center;justify-content:center;text-align:center}
+.gauge-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.gauge{height:95px;border-radius:120px 120px 0 0;background:conic-gradient(from 270deg,var(--bat) 0 50%,#1e293b 50% 100%);position:relative;overflow:hidden}.gauge:after{content:"";position:absolute;left:18%;right:18%;bottom:0;height:58%;background:#0f172a;border-radius:120px 120px 0 0}.gauge-label{position:absolute;left:0;right:0;bottom:8px;text-align:center;z-index:2}.mini-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
+.energy-area{display:grid;grid-template-columns:1.15fr .85fr;gap:10px;margin-top:10px}.periods{display:flex;gap:8px;margin-bottom:8px}.period{padding:7px 12px;border-radius:8px;background:#0f172a;border:1px solid var(--border);color:#cbd5e1;font-weight:900;cursor:pointer}.period.active{background:rgba(46,199,255,.18);border-color:rgba(46,199,255,.55)}
+.chart{height:205px;border-radius:14px;background:linear-gradient(rgba(120,150,190,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(120,150,190,.06) 1px,transparent 1px),#0b1220;background-size:100% 40px,50px 100%;padding:12px;position:relative}.bar{height:12px;background:#1e293b;border-radius:999px;overflow:hidden;margin-top:6px}.activity{display:grid;gap:8px}.activity-row{display:grid;grid-template-columns:34px 1fr auto;gap:9px;align-items:center;background:rgba(15,25,45,.72);border:1px solid rgba(126,161,206,.12);border-radius:11px;padding:8px}.activity-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(255,201,40,.12)}
+.footer{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px;padding:0 18px}.cmd{border:0;border-radius:14px;padding:10px 13px;font-weight:900;color:white;background:rgba(46,199,255,.24);cursor:pointer;margin:4px}.cmd:hover{background:rgba(46,199,255,.45)}
+
+.bms-pack{background:linear-gradient(180deg,rgba(15,25,45,.96),rgba(7,14,28,.95));border:1px solid var(--border);border-radius:20px;padding:14px;box-shadow:0 14px 45px rgba(0,0,0,.28)}
+.bms-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.bms-title{font-size:20px;font-weight:1000;letter-spacing:-.5px}
+.bms-pill{padding:6px 10px;border-radius:999px;background:rgba(36,224,109,.13);border:1px solid rgba(36,224,109,.35);color:#baffcf;font-size:12px;font-weight:900}
+.bms-top{display:grid;grid-template-columns:180px 1fr;gap:14px;align-items:center}
+.soc-ring{width:170px;height:170px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:auto;background:conic-gradient(var(--bat) 0 75%,#1e293b 75% 100%);box-shadow:0 0 45px rgba(36,224,109,.14)}
+.soc-ring-inner{width:112px;height:112px;border-radius:50%;background:#0f172a;display:flex;align-items:center;justify-content:center;text-align:center}
+.bms-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.bms-mini{background:rgba(15,25,45,.78);border:1px solid rgba(126,161,206,.14);border-radius:14px;padding:10px}
+.bms-mini .label{font-size:10px}.bms-mini .value{font-size:22px}
+.cell-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.temp-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
+
+/* ===== JK-BMS V2 VISUEL ===== */
+.bms-wall{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(420px,1fr));
+  gap:14px;
+}
+.bms-pack{
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 15% 0%,rgba(36,224,109,.18),transparent 32%),
+    radial-gradient(circle at 90% 10%,rgba(46,199,255,.12),transparent 36%),
+    linear-gradient(180deg,rgba(14,27,50,.98),rgba(5,12,25,.96));
+  border:1px solid rgba(126,161,206,.22);
+  border-radius:22px;
+  padding:14px;
+  box-shadow:0 20px 60px rgba(0,0,0,.34);
+}
+.bms-pack:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(126,161,206,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(126,161,206,.045) 1px,transparent 1px);
+  background-size:28px 28px;
+  pointer-events:none;
+}
+.bms-head{
+  position:relative;
+  z-index:1;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:14px;
+}
+.bms-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:22px;
+  font-weight:1000;
+  letter-spacing:-.6px;
+}
+.bms-title-icon{
+  width:38px;
+  height:38px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(36,224,109,.16);
+  border:1px solid rgba(36,224,109,.35);
+  box-shadow:0 0 24px rgba(36,224,109,.12);
+}
+.bms-pill{
+  padding:7px 11px;
+  border-radius:999px;
+  background:rgba(36,224,109,.13);
+  border:1px solid rgba(36,224,109,.38);
+  color:#baffcf;
+  font-size:12px;
+  font-weight:900;
+}
+.bms-body{
+  position:relative;
+  z-index:1;
+  display:grid;
+  grid-template-columns:185px 1fr;
+  gap:14px;
+  align-items:center;
+}
+.soc-ring{
+  width:170px;
+  height:170px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:conic-gradient(var(--bat) 0 75%,#182335 75% 100%);
+  box-shadow:0 0 45px rgba(36,224,109,.16);
+}
+.soc-ring-inner{
+  width:113px;
+  height:113px;
+  border-radius:50%;
+  background:#0b1424;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  border:1px solid rgba(126,161,206,.16);
+}
+.soc-ring-inner .value{
+  font-size:33px;
+}
+.bms-main-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:9px;
+}
+.bms-kpi{
+  background:rgba(9,18,34,.76);
+  border:1px solid rgba(126,161,206,.16);
+  border-radius:15px;
+  padding:10px;
+  min-height:82px;
+}
+.bms-kpi .label{font-size:10px}
+.bms-kpi .value{font-size:23px}
+.bms-kpi .small{font-size:11px}
+.sv-scale-bar{position:relative;height:8px;border-radius:999px;background:rgba(30,41,59,.95);overflow:hidden;margin-top:8px;border:1px solid rgba(126,161,206,.14)}
+.sv-scale-fill{position:absolute;top:0;bottom:0;border-radius:999px;background:linear-gradient(90deg,rgba(34,197,94,.85),rgba(46,199,255,.85));box-shadow:0 0 14px rgba(46,199,255,.22)}
+.sv-scale-zero{position:absolute;top:-2px;bottom:-2px;width:2px;background:rgba(255,255,255,.42);box-shadow:0 0 8px rgba(255,255,255,.25)}
+.sv-soc-wrap{display:grid;gap:8px;justify-items:center}
+.sv-soc-wrap .sv-scale-bar{width:155px;max-width:90%;margin-top:0}
+.bms-positive{border-color:rgba(36,224,109,.42)}
+.bms-negative{border-color:rgba(255,95,122,.42)}
+.bms-warn{border-color:rgba(255,159,67,.44)}
+.bms-blue{border-color:rgba(46,199,255,.42)}
+.bms-cells{
+  position:relative;
+  z-index:1;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  margin-top:12px;
+}
+.cell-card{
+  background:rgba(9,18,34,.72);
+  border:1px solid rgba(126,161,206,.14);
+  border-radius:14px;
+  padding:9px;
+}
+.cell-card .value{font-size:21px}
+.bms-temp-strip{
+  position:relative;
+  z-index:1;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+  margin-top:10px;
+}
+.temp-chip{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+  background:rgba(255,159,67,.09);
+  border:1px solid rgba(255,159,67,.25);
+  border-radius:12px;
+  padding:8px 9px;
+  font-weight:900;
+}
+.temp-chip span{
+  color:var(--muted);
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+.temp-chip b{
+  font-size:15px;
+}
+.bms-alert{
+  position:relative;
+  z-index:1;
+  margin-top:10px;
+  padding:9px 10px;
+  border-radius:13px;
+  background:rgba(46,199,255,.08);
+  border:1px solid rgba(46,199,255,.20);
+  color:#cfeeff;
+  font-size:12px;
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+@media(max-width:1200px){
+  .bms-wall,.bms-body,.bms-main-grid,.bms-cells,.bms-temp-strip{grid-template-columns:1fr}
+  .soc-ring{margin:auto}
+}
+
+@media(max-width:1200px){.bms-top,.bms-metrics,.cell-grid,.temp-grid{grid-template-columns:1fr}.soc-ring{width:150px;height:150px}}
+
+@media(max-width:1200px){.shell,.dash-grid,.energy-area,.cards4,.cards5,.cards3,.cards2,.donut-row,.gauge-row{grid-template-columns:1fr}.sidebar{min-height:auto}.flowbox{height:auto;min-height:900px;padding:12px}.node,.mppt,.solar-total,.n-grid,.n-load,.n-bat,.inverter-core{position:relative;left:auto;right:auto;top:auto;bottom:auto;transform:none;width:auto;margin:10px}svg.flow{display:none}}
+
+
+/* ===== DYNAMIC HTML DASHBOARD V12 ===== */
+.clickable{cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+.clickable:hover{transform:translateY(-2px);border-color:rgba(46,199,255,.7);box-shadow:0 18px 50px rgba(46,199,255,.16)}
+.dynamic-note{padding:10px 12px;border-radius:14px;background:rgba(46,199,255,.09);border:1px solid rgba(46,199,255,.24);color:#cfeeff;font-size:12px;margin-bottom:10px}
+.inv-wall{display:grid;grid-template-columns:repeat(2,minmax(420px,1fr));gap:14px}.inv-pack{position:relative;overflow:hidden;background:radial-gradient(circle at 12% 0%,rgba(255,201,40,.15),transparent 30%),radial-gradient(circle at 95% 12%,rgba(46,199,255,.13),transparent 34%),linear-gradient(180deg,rgba(14,27,50,.98),rgba(5,12,25,.96));border:1px solid rgba(126,161,206,.22);border-radius:22px;padding:14px;box-shadow:0 20px 60px rgba(0,0,0,.34)}
+.inv-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.inv-title{display:flex;align-items:center;gap:10px;font-size:22px;font-weight:1000}.inv-icon{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(255,201,40,.16);border:1px solid rgba(255,201,40,.35)}.inv-main{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.inv-mppt{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:10px}.inv-foot{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+.eco-hero{display:grid;grid-template-columns:1.1fr .9fr;gap:12px;margin-top:12px}.eco-big{position:relative;overflow:hidden;border-radius:22px;padding:18px;background:radial-gradient(circle at 15% 0%,rgba(34,197,94,.22),transparent 34%),radial-gradient(circle at 95% 0%,rgba(168,85,247,.18),transparent 35%),linear-gradient(135deg,rgba(15,23,42,.95),rgba(5,11,22,.98));border:1px solid rgba(126,161,206,.22);box-shadow:0 22px 70px rgba(0,0,0,.34)}.eco-big-value{font-size:54px;font-weight:1000;letter-spacing:-2px}.eco-big-sub{color:var(--muted);font-weight:900}.chart-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:12px;box-shadow:0 16px 45px rgba(0,0,0,.28)}.svg-chart{width:100%;height:300px;display:block}.chart-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.chart-tab{padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#0f172a;color:#cbd5e1;font-weight:900;cursor:pointer}.chart-tab.active{background:rgba(34,197,94,.16);border-color:rgba(34,197,94,.55);color:#dcffe8}.chart-legend{display:flex;gap:14px;flex-wrap:wrap;color:#cbd5e1;font-size:12px;font-weight:900}.legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px}
+.eco-tooltip{position:fixed;z-index:9999;display:none;pointer-events:none;background:rgba(2,6,23,.96);border:1px solid rgba(56,189,248,.45);box-shadow:0 18px 55px rgba(0,0,0,.45),0 0 30px rgba(56,189,248,.16);border-radius:14px;padding:10px 12px;color:#edf5ff;font-size:12px;font-weight:900;min-width:190px}.eco-tooltip .muted{color:#91a7c4;font-weight:800}.eco-hit{cursor:crosshair}.eco-hit:hover{opacity:.18}
+@media(max-width:1200px){.inv-wall,.inv-main,.inv-mppt,.inv-foot,.eco-hero{grid-template-columns:1fr}.eco-big-value{font-size:40px}}
+
+
+/* ===== MINI HISTORIQUE + COMMANDES AVANCÉES V16 ===== */
+.history-modal{position:fixed;inset:0;z-index:9999;display:none;align-items:center;justify-content:center;background:rgba(2,6,23,.72);backdrop-filter:blur(10px);padding:18px}
+.history-modal.open{display:flex}
+.history-box{width:min(1120px,97vw);background:linear-gradient(180deg,rgba(12,23,43,.98),rgba(5,12,25,.98));border:1px solid rgba(126,161,206,.28);border-radius:22px;box-shadow:0 30px 110px rgba(0,0,0,.58);overflow:hidden}
+.history-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;border-bottom:1px solid rgba(126,161,206,.15)}
+.history-title{font-size:18px;font-weight:1000}.history-sub{color:var(--muted);font-size:12px;margin-top:3px}
+.history-close{border:0;border-radius:12px;background:rgba(255,255,255,.08);color:white;font-size:22px;font-weight:900;width:42px;height:38px;cursor:pointer}
+.history-body{padding:18px}.history-svg{width:100%;height:min(440px,62vh);border-radius:18px;background:#06101d;border:1px solid rgba(126,161,206,.18)}
+.history-empty{padding:36px;text-align:center;color:var(--muted);font-weight:900}
+.history-tip{position:fixed;z-index:10001;display:none;pointer-events:none;background:rgba(2,6,23,.97);border:1px solid rgba(34,197,94,.45);box-shadow:0 18px 55px rgba(0,0,0,.45),0 0 30px rgba(34,197,94,.14);border-radius:14px;padding:10px 12px;color:#edf5ff;font-size:12px;font-weight:900;min-width:180px}.history-tip .muted{color:#91a7c4;font-weight:800}.history-hit{cursor:crosshair;touch-action:none;user-select:none;-webkit-user-select:none}.donut-detail{margin-top:10px;display:grid;gap:7px}.donut-detail-row{display:flex;justify-content:space-between;gap:10px;border-top:1px solid rgba(126,161,206,.12);padding-top:7px;font-size:12px;font-weight:900;color:#dbeafe}.donut-detail-row span{color:var(--muted)}
+.param-wall{display:grid;grid-template-columns:repeat(2,minmax(360px,1fr));gap:12px}
+.param-pack{background:rgba(9,18,34,.76);border:1px solid rgba(126,161,206,.16);border-radius:18px;padding:13px}
+.param-title{font-size:18px;font-weight:1000;margin-bottom:10px}
+.param-row{display:grid;grid-template-columns:1.1fr 1.25fr;gap:10px;align-items:center;padding:9px 0;border-top:1px solid rgba(126,161,206,.10)}
+.param-row:first-of-type{border-top:0}.param-name{font-weight:900;color:#dbeafe}.param-entity{font-size:10px;color:var(--muted);margin-top:2px}
+.param-control{display:flex;gap:8px;align-items:center;justify-content:flex-end}.param-control select,.param-control input{width:100%;min-width:150px;background:#0f172a;color:var(--txt);border:1px solid rgba(126,161,206,.28);border-radius:10px;padding:10px;font-weight:900;pointer-events:auto}.param-control button{border:0;border-radius:10px;background:rgba(46,199,255,.24);color:white;font-weight:1000;padding:10px 12px;cursor:pointer;white-space:nowrap}.param-control button:hover{background:rgba(46,199,255,.45)}
+.param-control input[type=number]{font-size:15px}.param-control select:focus,.param-control input:focus{outline:2px solid rgba(46,199,255,.55);box-shadow:0 0 22px rgba(46,199,255,.12)}
+.diag-wall{display:grid;grid-template-columns:repeat(2,minmax(420px,1fr));gap:14px}.diag-pack{position:relative;overflow:hidden;background:radial-gradient(circle at 12% 0%,rgba(155,92,255,.18),transparent 34%),radial-gradient(circle at 90% 0%,rgba(46,199,255,.12),transparent 34%),linear-gradient(180deg,rgba(12,23,43,.96),rgba(5,12,25,.96));border:1px solid rgba(126,161,206,.20);border-radius:22px;padding:14px;box-shadow:0 18px 55px rgba(0,0,0,.34)}.diag-pack:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(126,161,206,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(126,161,206,.045) 1px,transparent 1px);background-size:28px 28px;pointer-events:none}.diag-title{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:20px;font-weight:1000;margin-bottom:12px}.diag-status-pill{padding:7px 11px;border-radius:999px;font-size:12px;font-weight:1000;background:rgba(36,224,109,.13);border:1px solid rgba(36,224,109,.35);color:#baffcf}.diag-grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.diag-card{background:rgba(9,18,34,.76);border:1px solid rgba(126,161,206,.15);border-radius:15px;padding:10px;min-height:76px}.diag-card .label{font-size:10px}.diag-card .value{font-size:18px;word-break:break-word}.diag-card.big{grid-column:1/-1}.diag-card.warn{border-color:rgba(255,159,67,.38)}.diag-card.fault{border-color:rgba(255,95,122,.42)}.diag-card.ok{border-color:rgba(36,224,109,.42)}.diag-control{display:flex;gap:8px;align-items:center;margin-top:8px}.diag-control input{flex:1;background:#0f172a;color:var(--txt);border:1px solid rgba(126,161,206,.28);border-radius:10px;padding:10px;font-weight:900}.diag-control button,.diag-switch{border:0;border-radius:10px;background:rgba(46,199,255,.24);color:white;font-weight:1000;padding:10px 12px;cursor:pointer}.diag-switch.on{background:rgba(36,224,109,.28);color:#baffcf}.diag-switch.off{background:rgba(255,95,122,.20);color:#ffd2d9}
+
+.bms-subnav{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}.bms-subtab{border:1px solid rgba(126,161,206,.22);background:rgba(15,25,45,.82);color:#cbd5e1;padding:10px 14px;border-radius:999px;font-weight:1000;cursor:pointer}.bms-subtab.active{background:rgba(36,224,109,.18);border-color:rgba(36,224,109,.55);color:#d7ffe5}.bms-detail-hero{display:grid;grid-template-columns:260px 1fr;gap:14px;align-items:stretch}.bms-detail-nav{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.bms-detail-tab{border:1px solid rgba(126,161,206,.22);background:rgba(15,25,45,.84);color:#cbd5e1;padding:9px 12px;border-radius:12px;font-weight:1000;cursor:pointer}.bms-detail-tab.active{background:rgba(46,199,255,.18);border-color:rgba(46,199,255,.55);color:#fff}.bms-info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.info-tile{background:rgba(9,18,34,.76);border:1px solid rgba(126,161,206,.14);border-radius:15px;padding:10px;min-height:78px}.info-tile .label{font-size:10px}.info-tile .value{font-size:17px;word-break:break-word}.info-tile.good{border-color:rgba(36,224,109,.38)}.info-tile.warn{border-color:rgba(255,159,67,.42)}.info-tile.bad{border-color:rgba(255,95,122,.45)}.bms-control-wall{display:grid;grid-template-columns:repeat(2,minmax(420px,1fr));gap:9px}.bms-param-row{display:grid;grid-template-columns:1.25fr .9fr;gap:10px;align-items:center;background:rgba(9,18,34,.72);border:1px solid rgba(126,161,206,.14);border-radius:14px;padding:10px}.bms-param-name{font-size:13px;font-weight:1000}.bms-param-entity{font-size:10px;color:var(--muted);margin-top:3px;word-break:break-all}.bms-cell-wall{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.cell-meter{background:rgba(9,18,34,.76);border:1px solid rgba(126,161,206,.14);border-radius:14px;padding:9px}.cell-meter-head{display:flex;justify-content:space-between;font-weight:1000;font-size:12px}.cell-bar{height:10px;background:#172033;border-radius:999px;overflow:hidden;margin-top:8px}.cell-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#ef4444,#f59e0b,#22c55e)}.ohm-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#38bdf8,#a855f7)}.diag-wow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}.diag-wow-card{position:relative;overflow:hidden;background:radial-gradient(circle at 15% 0%,rgba(46,199,255,.18),transparent 35%),linear-gradient(180deg,rgba(13,25,46,.96),rgba(6,13,27,.96));border:1px solid rgba(126,161,206,.18);border-radius:18px;padding:13px;box-shadow:0 14px 40px rgba(0,0,0,.28)}.diag-wow-card .value{font-size:21px}.wide{grid-column:1/-1}.cmd-mini-btn{border:0;border-radius:10px;background:rgba(46,199,255,.24);color:white;font-weight:1000;padding:10px 12px;cursor:pointer}.cmd-input{background:#0f172a!important;color:var(--txt)!important;border:1px solid rgba(126,161,206,.28)!important;border-radius:10px!important;padding:10px!important;font-weight:900!important;min-width:130px}.cmd-select{background:#0f172a!important;color:var(--txt)!important;border:1px solid rgba(126,161,206,.28)!important;border-radius:10px!important;padding:10px!important;font-weight:900!important;min-width:150px}.cmd-toggle{border:0;border-radius:999px;padding:9px 13px;font-weight:1000;cursor:pointer}.cmd-toggle.on{background:rgba(36,224,109,.25);color:#baffcf}.cmd-toggle.off{background:rgba(255,95,122,.20);color:#ffd2d9}@media(max-width:1200px){.bms-detail-hero,.bms-info-grid,.bms-control-wall,.bms-param-row,.bms-cell-wall,.diag-wow{grid-template-columns:1fr}}
+
+@media(max-width:1200px){.param-wall,.param-row,.diag-wall,.diag-grid{grid-template-columns:1fr}.param-control{justify-content:stretch}}
+
+
+
+/* ===== V24 GLOBAL CLEANUP + ALARMS ===== */
+#global .energy-area{display:none!important}
+#global .side-stack > .panel:nth-child(1),
+#global .side-stack > .panel:nth-child(3),
+#global .side-stack > .panel:nth-child(4){display:none!important}
+#global .side-stack{align-content:start}
+.system-alarm-panel{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.alarm-box{background:rgba(12,23,43,.96);border:1px solid rgba(126,161,206,.22);border-radius:16px;padding:13px;box-shadow:0 16px 45px rgba(0,0,0,.25)}
+.alarm-box .alarm-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:1000;text-transform:uppercase;letter-spacing:.7px;color:#dbeafe;margin-bottom:10px}
+.alarm-icon{font-size:27px;filter:drop-shadow(0 0 12px rgba(255,95,122,.35))}
+.alarm-row{display:flex;justify-content:space-between;gap:10px;align-items:center;background:rgba(15,25,45,.72);border:1px solid rgba(126,161,206,.12);border-radius:12px;padding:9px;margin-top:7px;font-size:13px}
+.alarm-ok{color:#52ff91;font-weight:1000}.alarm-warn{color:#ffd36a;font-weight:1000}.alarm-fault{color:#ff6b80;font-weight:1000}
+.core-alarm-strip{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:7px}.core-alarm-strip span{font-size:10px;padding:4px 6px;border-radius:8px;background:rgba(15,25,45,.75);border:1px solid rgba(126,161,206,.18)}
+.bat-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px}.bat-chip{padding:7px;border-radius:10px;background:rgba(7,15,30,.65);border:1px solid rgba(36,224,109,.25)}.bat-chip b{display:block;font-size:14px}.bat-chip small{color:#91a7c4;font-size:9px;text-transform:uppercase;font-weight:900}
+.inv-subnav,.inv-innernav{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}.subtab{padding:9px 13px;border-radius:12px;border:1px solid var(--border);background:#0f172a;color:#dbeafe;font-weight:900;cursor:pointer}.subtab.active{background:rgba(46,199,255,.20);border-color:rgba(46,199,255,.65)}
+.inv-view,.inv-inner-view{display:none}.inv-view.active,.inv-inner-view.active{display:block}.inv-hero{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.inv-command-diag{margin-top:12px}
+@media(max-width:1200px){.system-alarm-panel,.inv-hero{grid-template-columns:1fr}}
+
+
+/* V27 stability + visual fixes */
+.v27-stacked{display:grid!important;grid-template-columns:1fr!important;gap:12px!important}.v27-full{width:100%!important}.inv-alarm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}.inv-alarm-card{background:rgba(10,20,38,.72);border:1px solid rgba(126,161,206,.18);border-radius:14px;padding:10px}.details-row b{white-space:normal;word-break:break-word;line-height:1.35}.core-chip,.bat-chip{background:rgba(8,18,34,.72);border:1px solid rgba(126,161,206,.22);border-radius:10px;padding:6px 9px;font-weight:1000;display:inline-flex;gap:4px;align-items:center}.temp-bms-line{font-size:14px!important;color:#baffcf!important;margin-top:8px!important}.inv-subnav,.inv-innernav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.subtab{border:1px solid rgba(126,161,206,.25);background:#101a2e;color:#dbeafe;border-radius:12px;padding:9px 13px;font-weight:1000;cursor:pointer}.subtab.active{background:rgba(46,199,255,.20);border-color:rgba(46,199,255,.7)}.inv-view,.inv-inner-view{display:none}.inv-view.active,.inv-inner-view.active{display:block}.inv-global-kpis{margin-bottom:12px}.inv-detected-cards .card{min-height:120px}.mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}.mini-grid span{font-size:12px;color:#9fb2cc}.mini-grid b{display:block;color:#fff}.icon,.ico,.activity-icon,.alarm-icon{opacity:1!important;filter:drop-shadow(0 0 8px rgba(46,199,255,.45));}.system-alarm-panel{max-height:none!important;overflow:visible!important}.side-stack{overflow:visible!important}.alarm-ok{color:#4ade80!important}.alarm-warn{color:#ffd166!important}.alarm-bad{color:#ff6b8a!important}
+
+
+/* V28 fixes: compact inverter tabs + clearer temperature */
+#inverters .inv-subnav,#inverters .inv-innernav{display:flex!important;align-items:flex-start!important;align-content:flex-start!important;gap:8px!important;flex-wrap:wrap!important;margin:8px 0 14px!important;min-height:0!important;height:auto!important}
+#inverters .inv-subnav .subtab,#inverters .inv-innernav .subtab{height:auto!important;min-height:0!important;max-height:42px!important;flex:0 0 auto!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;padding:9px 14px!important;border-radius:999px!important;line-height:1.1!important;width:auto!important}
+.core-temp-line{margin-top:7px!important;color:#bff7ff!important;font-size:13px!important;font-weight:1000!important;text-shadow:0 0 10px rgba(56,189,248,.35)}
+.core-extra{display:flex!important;flex-wrap:wrap!important;justify-content:center!important;gap:6px!important}
+.core-extra span{background:rgba(8,18,34,.72);border:1px solid rgba(126,161,206,.22);border-radius:10px;padding:5px 8px;font-weight:1000;font-size:12px}
+.param-row:not(.param-missing),.diag-card:not(.param-missing){border-color:rgba(46,199,255,.22)!important}
+.param-pack,.diag-pack{max-width:100%;overflow:hidden}.param-control{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+
+#jkbms .clickable:hover,#jkbms .bms-pack:hover,#jkbms .bms-subtab:hover,#jkbms .bms-detail-tab:hover{transform:none!important}
+
+/* JK module only: generated from JK-BMS add-on */
+body.module-jk-only #global,
+body.module-jk-only #inverters,
+body.module-jk-only #energy,
+body.module-jk-only #eco,
+body.module-jk-only #params,
+body.module-jk-only #diag{display:none!important}
+body.module-jk-only #jkbms{display:block!important}
+body.module-jk-only .shell{grid-template-columns:190px 1fr}
+
+/* JK global summary bars */
+#bms_summary .sv-summary-bar{height:8px;background:#172033;border-radius:999px;overflow:hidden;margin-top:9px;border:1px solid rgba(126,161,206,.10)}
+#bms_summary .sv-summary-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#21df69,#7cffad);box-shadow:0 0 16px rgba(33,223,105,.28)}
+#bms_summary .card.red .sv-summary-fill{background:linear-gradient(90deg,#ff5f7a,#ff9f43)}
+#bms_summary .card.orange .sv-summary-fill{background:linear-gradient(90deg,#ff9f43,#ffc928)}
+#bms_summary .card.load .sv-summary-fill,#bms_summary .card.gridc .sv-summary-fill{background:linear-gradient(90deg,#20c7ff,#21df69)}
+
+
+
+
+
+/* ===== BROADCASTING LOCK BADGE V48 ===== */
+.broadcast-lock-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 12px;border-radius:999px;
+  background:rgba(255,180,0,.12);
+  border:1px solid rgba(255,180,0,.35);
+  color:#ffcf66;font-size:12px;font-weight:1000;
+  backdrop-filter:blur(8px);white-space:nowrap;
+  box-shadow:0 0 18px rgba(255,180,0,.10);
+}
+@media (min-width:761px){
+  .bms-head .broadcast-lock-badge{margin-left:auto;}
+}
+@media (max-width:760px){
+  .bms-head{align-items:flex-start;flex-wrap:wrap;}
+  .bms-head .broadcast-lock-badge{
+    order:3;flex:0 0 auto;margin-top:6px;margin-left:48px;
+    max-width:calc(100% - 52px);font-size:11px;white-space:normal;
+  }
+}
+/* ===== RESPONSIVE SAFE V25 ===== */
+@media (max-width: 760px){
+  html,body{overflow-x:hidden;width:100%;}
+  .app{padding:6px;gap:6px;}
+  .shell{display:grid;grid-template-columns:1fr;gap:8px;min-height:auto;}
+  .sidebar{position:relative;border-radius:18px;padding:12px;min-height:auto;}
+  .brand{font-size:20px;margin-bottom:10px;}
+  .premium{margin-bottom:10px;}
+  .nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+  .tab{font-size:14px;padding:10px;}
+  .main{min-width:0;width:100%;}
+  .topbar{height:auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:8px;margin:6px 0 8px;}
+  .left-title h1{font-size:24px;letter-spacing:-.8px;}
+  .statusbar{display:flex;flex-wrap:wrap;gap:7px;width:100%;}
+  .pill,.premium-pill{font-size:12px;padding:7px 10px;}
+  .cmd{font-size:12px;padding:9px 11px;margin:2px;}
+  .panel{border-radius:16px;padding:10px;}
+  .title{font-size:18px;}
+  .cards2,.cards3,.cards4,.cards5,.dash-grid,.energy-area,.donut-row,.gauge-row{grid-template-columns:1fr!important;}
+  .bms-wall{grid-template-columns:1fr!important;gap:10px;}
+  .bms-pack{border-radius:18px;padding:10px;}
+  .bms-head{margin-bottom:10px;}
+  .bms-title{font-size:18px;}
+  .bms-body{display:grid;grid-template-columns:92px minmax(0,1fr)!important;gap:9px;align-items:center;}
+  .soc-ring{width:86px!important;height:120px!important;border-radius:22px;margin:0 auto;}
+  .soc-ring-inner{width:60px!important;height:82px!important;border-radius:16px;}
+  .soc-ring-inner .value{font-size:20px!important;}
+  .bms-main-grid,.bms-cells,.bms-temp-strip{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px;}
+  .bms-kpi,.bms-mini,.cell-card,.temp-chip{min-width:0;padding:7px;border-radius:12px;}
+  .bms-kpi .value,.bms-mini .value,.cell-card .value,.card .value{font-size:18px!important;letter-spacing:-.3px;}
+  .label{font-size:9px!important;letter-spacing:.8px;}
+  .small{font-size:10px!important;}
+  .footer{font-size:10px;flex-wrap:wrap;gap:6px;padding:0 6px;}
+  .history-modal{align-items:flex-start;justify-content:center;padding:6px;overflow:auto;}
+  .history-box{width:100%;max-width:100%;border-radius:18px;}
+  .history-head{padding:12px;gap:8px;}
+  .history-title{font-size:15px;max-width:calc(100vw - 92px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .history-sub{font-size:10px;max-width:calc(100vw - 92px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .history-body{padding:10px;}
+  .history-svg{height:330px!important;width:100%!important;}
+}
+@media (min-width:761px) and (max-width:1100px){
+  .shell{grid-template-columns:160px 1fr;}
+  .bms-wall{grid-template-columns:1fr!important;}
+  .bms-main-grid,.bms-cells,.bms-temp-strip{grid-template-columns:repeat(3,minmax(0,1fr))!important;}
+}
+
+/* ===== JK-BMS responsive PC / smartphone HA app ===== */
+html,body{max-width:100%;overflow-x:hidden;}
+.app,.shell,.main,#jkbms{max-width:100%;min-width:0;}
+img,svg,canvas{max-width:100%;}
+@media (max-width: 1100px){
+  .app{padding:8px;}
+  body.module-jk-only .shell,.shell{grid-template-columns:1fr!important;min-height:auto!important;}
+  .sidebar{position:relative!important;border-radius:18px!important;padding:10px!important;display:grid!important;grid-template-columns:1fr!important;gap:8px!important;}
+  .brand{margin-bottom:6px!important;font-size:18px!important;}
+  .premium{margin-bottom:6px!important;padding:9px!important;}
+  .nav{display:flex!important;gap:8px!important;overflow-x:auto!important;padding-bottom:2px!important;}
+  .tab{white-space:nowrap!important;min-width:max-content!important;padding:10px 12px!important;}
+  .side-bottom{position:static!important;margin-top:6px!important;}
+  .topbar{height:auto!important;min-height:48px!important;align-items:flex-start!important;flex-wrap:wrap!important;}
+  .left-title{flex-wrap:wrap!important;}
+  .left-title h1{font-size:22px!important;letter-spacing:-.8px!important;}
+  .statusbar{justify-content:flex-start!important;width:100%!important;}
+  .pill,.premium-pill{padding:7px 10px!important;font-size:12px!important;}
+  .panel{padding:10px!important;border-radius:16px!important;}
+  .cards5,.cards4,.cards3,.cards2,#bms_summary{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  .bms-wall{grid-template-columns:1fr!important;gap:10px!important;}
+  .bms-pack{padding:11px!important;border-radius:18px!important;}
+  .bms-body,.bms-top{grid-template-columns:140px 1fr!important;gap:10px!important;}
+  .soc-ring{width:132px!important;height:132px!important;}
+  .soc-ring-inner{width:88px!important;height:88px!important;}
+  .soc-ring-inner .value{font-size:25px!important;}
+  .bms-main-grid,.bms-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;}
+  .bms-cells,.cell-grid,.bms-temp-strip,.temp-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  .bms-kpi,.bms-mini,.cell-card,.temp-chip{min-width:0!important;}
+  .bms-kpi .value,.bms-mini .value,.card .value{font-size:20px!important;}
+  .history-modal,.modal,.chart-modal{max-width:96vw!important;width:96vw!important;left:2vw!important;right:2vw!important;}
+}
+@media (max-width: 640px){
+  .app{padding:6px!important;gap:6px!important;}
+  .sidebar{border-radius:16px!important;}
+  .brand{font-size:17px!important;}
+  .left-title h1{font-size:20px!important;}
+  .statusbar{gap:6px!important;}
+  .cards5,.cards4,.cards3,.cards2,#bms_summary{grid-template-columns:1fr!important;}
+  .bms-head{align-items:flex-start!important;gap:8px!important;}
+  .bms-title{font-size:19px!important;}
+  .bms-body,.bms-top{grid-template-columns:1fr!important;}
+  .soc-ring{margin:0 auto!important;width:128px!important;height:128px!important;}
+  .bms-main-grid,.bms-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;}
+  .bms-cells,.cell-grid,.bms-temp-strip,.temp-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;}
+  .bms-kpi,.bms-mini,.cell-card,.temp-chip{min-width:0!important;padding:8px!important;}
+  .bms-kpi .value,.bms-mini .value{font-size:20px!important;letter-spacing:-.5px!important;}
+  .bms-kpi .label,.bms-mini .label{font-size:9px!important;letter-spacing:.7px!important;}
+  .value{font-size:21px!important;}
+  .label{font-size:9px!important;letter-spacing:.8px!important;}
+  .cmd{width:100%!important;margin:4px 0!important;}
+  .footer{display:block!important;text-align:center!important;padding:4px!important;}
+}
+
+
+/* ===== JK-BMS responsive PC / smartphone HA app ===== */
+html,body{max-width:100%;overflow-x:hidden;}
+.app,.shell,.main,#jkbms{max-width:100%;min-width:0;}
+img,svg,canvas{max-width:100%;}
+@media (max-width: 1100px){
+  .app{padding:8px;}
+  body.module-jk-only .shell,.shell{grid-template-columns:1fr!important;min-height:auto!important;}
+  .sidebar{position:relative!important;border-radius:18px!important;padding:10px!important;display:grid!important;grid-template-columns:1fr!important;gap:8px!important;}
+  .brand{margin-bottom:6px!important;font-size:18px!important;}
+  .premium{margin-bottom:6px!important;padding:9px!important;}
+  .nav{display:flex!important;gap:8px!important;overflow-x:auto!important;padding-bottom:2px!important;}
+  .tab{white-space:nowrap!important;min-width:max-content!important;padding:10px 12px!important;}
+  .side-bottom{position:static!important;margin-top:6px!important;}
+  .topbar{height:auto!important;min-height:48px!important;align-items:flex-start!important;flex-wrap:wrap!important;}
+  .left-title{flex-wrap:wrap!important;}
+  .left-title h1{font-size:22px!important;letter-spacing:-.8px!important;}
+  .statusbar{justify-content:flex-start!important;width:100%!important;}
+  .pill,.premium-pill{padding:7px 10px!important;font-size:12px!important;}
+  .panel{padding:10px!important;border-radius:16px!important;}
+  .cards5,.cards4,.cards3,.cards2,#bms_summary{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  .bms-wall{grid-template-columns:1fr!important;gap:10px!important;}
+  .bms-pack{padding:11px!important;border-radius:18px!important;}
+  .bms-body,.bms-top{grid-template-columns:140px 1fr!important;gap:10px!important;}
+  .soc-ring{width:132px!important;height:132px!important;}
+  .soc-ring-inner{width:88px!important;height:88px!important;}
+  .soc-ring-inner .value{font-size:25px!important;}
+  .bms-main-grid,.bms-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;}
+  .bms-cells,.cell-grid,.bms-temp-strip,.temp-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  .bms-kpi,.bms-mini,.cell-card,.temp-chip{min-width:0!important;}
+  .bms-kpi .value,.bms-mini .value,.card .value{font-size:20px!important;}
+  .history-modal,.modal,.chart-modal{max-width:96vw!important;width:96vw!important;left:2vw!important;right:2vw!important;}
+}
+@media (max-width: 640px){
+  .app{padding:6px!important;gap:6px!important;}
+  .sidebar{border-radius:16px!important;}
+  .brand{font-size:17px!important;}
+  .left-title h1{font-size:20px!important;}
+  .statusbar{gap:6px!important;}
+  .cards5,.cards4,.cards3,.cards2,#bms_summary{grid-template-columns:1fr!important;}
+  .bms-head{align-items:flex-start!important;gap:8px!important;}
+  .bms-title{font-size:19px!important;}
+  .bms-body,.bms-top{grid-template-columns:1fr!important;}
+  .soc-ring{margin:0 auto!important;width:128px!important;height:128px!important;}
+  .bms-main-grid,.bms-metrics{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;}
+  .bms-cells,.cell-grid,.bms-temp-strip,.temp-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;}
+  .bms-kpi,.bms-mini,.cell-card,.temp-chip{min-width:0!important;padding:8px!important;}
+  .bms-kpi .value,.bms-mini .value{font-size:20px!important;letter-spacing:-.5px!important;}
+  .bms-kpi .label,.bms-mini .label{font-size:9px!important;letter-spacing:.7px!important;}
+  .value{font-size:21px!important;}
+  .label{font-size:9px!important;letter-spacing:.8px!important;}
+  .cmd{width:100%!important;margin:4px 0!important;}
+  .footer{display:block!important;text-align:center!important;padding:4px!important;}
+}
+
+/* ===== V50 mobile: 2 infos per row inside each battery card only ===== */
+@media (max-width:640px){
+  #jkbms .bms-pack .bms-main-grid,
+  #jkbms .bms-pack .bms-metrics,
+  #jkbms .bms-pack .bms-cells,
+  #jkbms .bms-pack .cell-grid,
+  #jkbms .bms-pack .bms-temp-strip,
+  #jkbms .bms-pack .temp-grid{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:8px!important;
+  }
+  #jkbms .bms-pack .bms-kpi,
+  #jkbms .bms-pack .bms-mini,
+  #jkbms .bms-pack .cell-card,
+  #jkbms .bms-pack .temp-chip{
+    min-width:0!important;
+    width:auto!important;
+  }
+}
+
+
+/* ===== JK module embedded in Smart Energy shell - no duplicate header/sidebar ===== */
+body.module-jk-only{background:transparent!important;overflow-x:hidden!important;}
+body.module-jk-only .app{min-height:100vh!important;padding:0!important;display:block!important;gap:0!important;}
+body.module-jk-only .shell{display:block!important;grid-template-columns:1fr!important;min-height:100vh!important;gap:0!important;}
+body.module-jk-only .sidebar{display:none!important;}
+body.module-jk-only .main{width:100%!important;max-width:100%!important;min-width:0!important;display:block!important;}
+body.module-jk-only .main>.topbar{display:none!important;}
+body.module-jk-only #jkbms{display:block!important;width:100%!important;max-width:100%!important;padding:12px!important;}
+body.module-jk-only .footer{display:none!important;}
+@media (max-width:1100px){
+  body.module-jk-only .app{padding:0!important;}
+  body.module-jk-only .shell{display:block!important;grid-template-columns:1fr!important;}
+  body.module-jk-only .sidebar{display:none!important;}
+  body.module-jk-only .main>.topbar{display:none!important;}
+  body.module-jk-only #jkbms{padding:8px!important;}
+}
+
+
+
+/* ===== PYLONTECH DASHBOARD ADAPTATION ===== */
+body.module-pylontech{background:transparent!important;overflow-x:hidden!important;}
+body.module-pylontech .app{min-height:100vh!important;padding:0!important;display:block!important;gap:0!important;}
+body.module-pylontech .shell{display:block!important;grid-template-columns:1fr!important;min-height:100vh!important;gap:0!important;}
+body.module-pylontech .sidebar{display:none!important;}
+body.module-pylontech .main{width:100%!important;max-width:100%!important;min-width:0!important;display:block!important;}
+body.module-pylontech .main>.topbar{display:none!important;}
+body.module-pylontech #jkbms{display:block!important;width:100%!important;max-width:100%!important;padding:12px!important;}
+body.module-pylontech .footer{display:none!important;}
+.pylon-hint{padding:10px 12px;border-radius:14px;background:rgba(46,199,255,.09);border:1px solid rgba(46,199,255,.24);color:#cfeeff;font-size:12px;margin:0 0 12px;font-weight:800}
+.pylon-empty{padding:26px;border-radius:18px;background:rgba(9,18,34,.72);border:1px dashed rgba(126,161,206,.28);color:#cbd5e1;text-align:center;font-weight:900}
+.pylon-bank-hero{display:grid;grid-template-columns:260px 1fr;gap:14px;align-items:stretch;margin-bottom:14px}
+.pylon-bank-card{position:relative;overflow:hidden;border-radius:22px;padding:16px;background:radial-gradient(circle at 15% 0%,rgba(36,224,109,.20),transparent 35%),radial-gradient(circle at 95% 10%,rgba(46,199,255,.13),transparent 36%),linear-gradient(180deg,rgba(14,27,50,.98),rgba(5,12,25,.96));border:1px solid rgba(126,161,206,.22);box-shadow:0 20px 60px rgba(0,0,0,.34)}
+.pylon-bank-card .value.big{font-size:46px;letter-spacing:-2px}.pylon-statusline{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.pylon-status-chip{padding:7px 10px;border-radius:999px;background:rgba(15,25,45,.84);border:1px solid rgba(126,161,206,.22);font-size:12px;font-weight:1000;color:#dbeafe}
+.pylon-detail-grid{display:grid;grid-template-columns:260px 1fr;gap:14px;align-items:start}.pylon-detail-side{display:grid;gap:10px}.pylon-info-wall{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.pylon-state-wall{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.pylon-cell-wall{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.pylon-cell-meter{background:rgba(9,18,34,.76);border:1px solid rgba(126,161,206,.14);border-radius:14px;padding:9px}.pylon-cell-meter .value{font-size:20px}.pylon-mini-entity{font-size:10px;color:var(--muted);word-break:break-all;margin-top:5px}.pylon-missing{opacity:.58;border-style:dashed!important}.pylon-warn{border-color:rgba(255,159,67,.46)!important}.pylon-fault{border-color:rgba(255,95,122,.50)!important}.pylon-good{border-color:rgba(36,224,109,.44)!important}
+@media(max-width:1200px){.pylon-bank-hero,.pylon-detail-grid,.pylon-info-wall,.pylon-state-wall{grid-template-columns:1fr}.pylon-cell-wall{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){body.module-pylontech #jkbms{padding:8px!important}.pylon-bank-card .value.big{font-size:36px}.pylon-cell-wall{grid-template-columns:repeat(2,minmax(0,1fr))}.pylon-statusline{gap:6px}.pylon-status-chip{font-size:11px}}
+
+
+/* ===== PYLONTECH FIX V2: no overlap + entity suffix resolver support ===== */
+.bms-wall{
+  grid-template-columns:repeat(auto-fit,minmax(min(680px,100%),1fr))!important;
+  align-items:start!important;
+}
+.bms-pack,.card,.bms-kpi,.cell-card,.diag-card,.diag-pack,.pylon-bank-card{
+  min-width:0!important;
+  overflow:hidden!important;
+}
+.bms-body{
+  grid-template-columns:minmax(135px,170px) minmax(0,1fr)!important;
+  align-items:center!important;
+}
+.bms-main-grid{
+  grid-template-columns:repeat(auto-fit,minmax(145px,1fr))!important;
+}
+.bms-cells{
+  grid-template-columns:repeat(auto-fit,minmax(145px,1fr))!important;
+}
+.cards4,.diag-grid,.pylon-info-wall,.pylon-state-wall{
+  grid-template-columns:repeat(auto-fit,minmax(170px,1fr))!important;
+}
+.pylon-bank-hero{
+  grid-template-columns:minmax(260px,.85fr) minmax(0,1.15fr)!important;
+}
+.value,.bms-kpi .value,.cell-card .value,.card .value,.diag-card .value{
+  overflow-wrap:anywhere!important;
+  word-break:break-word!important;
+  line-height:1.12!important;
+  max-width:100%!important;
+}
+.cell-card .value[style],.bms-kpi .value[style]{font-size:clamp(14px,1.2vw,18px)!important}
+.pylon-mini-entity,.small{
+  overflow-wrap:anywhere!important;
+  word-break:break-word!important;
+}
+.pylon-missing .pylon-mini-entity{color:#ff9f43!important}
+@media(max-width:1500px){
+  .bms-body{grid-template-columns:130px minmax(0,1fr)!important}
+  .soc-ring{width:132px!important;height:132px!important}
+  .soc-ring-inner{width:88px!important;height:88px!important}
+  .soc-ring-inner .value{font-size:25px!important}
+  .bms-main-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .bms-cells{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media(max-width:1100px){
+  .pylon-bank-hero,.bms-body{grid-template-columns:1fr!important}
+  .bms-main-grid,.bms-cells,.cards4,.diag-grid,.pylon-info-wall,.pylon-state-wall{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:640px){
+  .bms-main-grid,.bms-cells,.cards4,.diag-grid,.pylon-info-wall,.pylon-state-wall{grid-template-columns:1fr!important}
+}
+
+
+
+
+/* ===== PYLONTECH DETAIL FIX V5 ===== */
+.pylon-detail-grid{
+  grid-template-columns:minmax(240px,280px) minmax(0,1fr)!important;
+  align-items:start!important;
+}
+.pylon-detail-side{
+  min-width:0!important;
+  align-self:start!important;
+}
+.pylon-detail-grid > .cards4{
+  min-width:0!important;
+  display:grid!important;
+  grid-template-columns:repeat(auto-fit,minmax(165px,1fr))!important;
+  align-content:start!important;
+}
+.pylon-side-card{
+  position:relative;
+  overflow:hidden;
+  border-radius:20px;
+  padding:14px;
+  background:radial-gradient(circle at 15% 0%,rgba(36,224,109,.18),transparent 34%),radial-gradient(circle at 95% 10%,rgba(46,199,255,.12),transparent 35%),linear-gradient(180deg,rgba(14,27,50,.98),rgba(5,12,25,.96));
+  border:1px solid rgba(126,161,206,.22);
+  box-shadow:0 16px 45px rgba(0,0,0,.30);
+}
+.pylon-side-card .bms-head{margin-bottom:10px!important}
+.pylon-side-card .soc-ring{margin:6px auto 10px auto!important}
+.pylon-side-top{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.pylon-side-metric{background:rgba(9,18,34,.76);border:1px solid rgba(126,161,206,.15);border-radius:14px;padding:9px;min-width:0!important;overflow:hidden}
+.pylon-side-metric .label{font-size:10px}
+.pylon-side-metric .value{font-size:22px;line-height:1.08;overflow-wrap:anywhere;word-break:break-word;max-width:100%}
+.pylon-side-metric .small{margin-top:4px}
+.pylon-alarm-box{margin-top:10px;background:rgba(9,18,34,.76);border:1px solid rgba(126,161,206,.15);border-radius:14px;padding:10px;overflow:hidden}
+.pylon-alarm-box .value{font-size:16px;line-height:1.2;overflow-wrap:anywhere;word-break:break-word;max-width:100%}
+.pylon-alarm-box .small,.pylon-alarm-box .pylon-mini-entity{overflow-wrap:anywhere;word-break:break-word}
+@media(max-width:1200px){
+  .pylon-detail-grid{grid-template-columns:1fr!important}
+  .pylon-detail-grid > .cards4{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:640px){
+  .pylon-detail-grid > .cards4,.pylon-side-top{grid-template-columns:1fr!important}
+}
+
+/* ===== PYLONTECH HISTORY GRAPH V6 ===== */
+.history-chart-wrap{margin-top:12px;background:rgba(6,16,29,.82);border:1px solid rgba(126,161,206,.18);border-radius:18px;padding:12px;overflow:hidden}
+.history-chart-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.history-chart-title{font-size:13px;font-weight:1000;color:#dbeafe;text-transform:uppercase;letter-spacing:.6px}
+.history-chart-meta{font-size:11px;font-weight:900;color:var(--muted)}
+.history-svg{width:100%;height:min(430px,58vh);display:block;border-radius:16px;background:linear-gradient(rgba(120,150,190,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(120,150,190,.06) 1px,transparent 1px),#06101d;background-size:100% 20%,12.5% 100%;border:1px solid rgba(126,161,206,.18)}
+.history-line{fill:none;stroke:rgba(33,223,105,.95);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 8px rgba(33,223,105,.25))}
+.history-area{fill:rgba(33,223,105,.10)}
+.history-axis{stroke:rgba(126,161,206,.30);stroke-width:1}
+.history-grid-line{stroke:rgba(126,161,206,.12);stroke-width:1}
+.history-label{fill:#91a7c4;font-size:11px;font-weight:800}
+.history-dot{fill:#21df69;stroke:#071326;stroke-width:2}
+.history-loading{padding:22px;text-align:center;color:#91a7c4;font-weight:900;border-radius:14px;background:rgba(9,18,34,.70);border:1px dashed rgba(126,161,206,.20)}
+.history-error{padding:16px;color:#ffd7a6;background:rgba(255,159,67,.10);border:1px solid rgba(255,159,67,.30);border-radius:14px;font-weight:900}
+.pylon-entity-actions{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:640px){.history-svg{height:320px!important}.history-chart-wrap{padding:8px}.history-chart-head{align-items:flex-start}}
+
+/* ===== PYLONTECH CLEAN UI V4 : IDs masqués, visibles au clic ===== */
+body.module-pylontech #jkbms .pylon-mini-entity{
+  display:none!important;
+}
+body.module-pylontech .history-modal .pylon-mini-entity,
+body.module-pylontech .history-modal .pylon-entity-box{
+  display:block!important;
+}
+body.module-pylontech #jkbms .card.pylon-missing,
+body.module-pylontech #jkbms .cell-card.pylon-missing,
+body.module-pylontech #jkbms .bms-kpi.pylon-missing,
+body.module-pylontech #jkbms .pylon-side-metric.pylon-missing{
+  position:relative;
+}
+body.module-pylontech #jkbms .card.pylon-missing::after{
+  content:"entité absente";
+  display:inline-flex;
+  margin-top:7px;
+  padding:4px 7px;
+  border-radius:999px;
+  background:rgba(255,159,67,.12);
+  border:1px solid rgba(255,159,67,.30);
+  color:#ffd7a6;
+  font-size:10px;
+  font-weight:1000;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+}
+.pylon-entity-box{
+  margin-bottom:12px;
+  padding:12px;
+  border-radius:16px;
+  background:rgba(46,199,255,.08);
+  border:1px solid rgba(46,199,255,.24);
+  color:#dff6ff;
+}
+.pylon-entity-label{
+  font-size:10px;
+  color:#91a7c4;
+  text-transform:uppercase;
+  font-weight:1000;
+  letter-spacing:1px;
+  margin-bottom:5px;
+}
+.pylon-entity-id{
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  font-size:13px;
+  font-weight:900;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+.pylon-entity-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+.pylon-entity-copy{
+  border:0;
+  border-radius:10px;
+  padding:8px 11px;
+  background:rgba(46,199,255,.24);
+  color:white;
+  font-weight:1000;
+  cursor:pointer;
+}
+.pylon-entity-copy:hover{background:rgba(46,199,255,.42)}
+
+
+/* ===== PYLONTECH_MOBILE_RESPONSIVE_FIX_V8 ===== */
+body.module-pylontech{max-width:100%;overflow-x:hidden!important}
+body.module-pylontech #jkbms{min-width:0!important}
+body.module-pylontech .panel,
+body.module-pylontech .bms-pack,
+body.module-pylontech .card,
+body.module-pylontech .pylon-bank-card,
+body.module-pylontech .pylon-side-card{max-width:100%!important;min-width:0!important}
+@media(max-width:760px){
+  html,body{width:100%!important;max-width:100%!important;overflow-x:hidden!important}
+  body.module-pylontech{overflow:auto!important}
+  body.module-pylontech .app,
+  body.module-pylontech .shell,
+  body.module-pylontech .main{width:100%!important;max-width:100%!important;min-width:0!important;overflow-x:hidden!important}
+  body.module-pylontech #jkbms{padding:6px!important;width:100%!important;max-width:100%!important}
+  body.module-pylontech .panel{padding:7px!important;border-radius:14px!important}
+  body.module-pylontech .title{font-size:17px!important;margin-bottom:8px!important}
+  body.module-pylontech .bms-subnav,
+  body.module-pylontech .bms-detail-nav{
+    position:sticky;
+    top:0;
+    z-index:60;
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    gap:7px!important;
+    padding:6px 0 8px!important;
+    margin:0 0 8px!important;
+    background:linear-gradient(180deg,rgba(5,11,22,.98),rgba(5,11,22,.88));
+    -webkit-overflow-scrolling:touch;
+  }
+  body.module-pylontech .bms-subtab,
+  body.module-pylontech .bms-detail-tab{
+    flex:0 0 auto!important;
+    white-space:nowrap!important;
+    padding:9px 11px!important;
+    font-size:12px!important;
+    border-radius:999px!important;
+  }
+  body.module-pylontech #bms_summary,
+  body.module-pylontech .cards4,
+  body.module-pylontech .diag-wow,
+  body.module-pylontech .diag-grid,
+  body.module-pylontech .pylon-info-wall,
+  body.module-pylontech .pylon-state-wall,
+  body.module-pylontech .pylon-detail-grid > .cards4{
+    grid-template-columns:1fr!important;
+    gap:8px!important;
+  }
+  body.module-pylontech .pylon-bank-hero,
+  body.module-pylontech .pylon-detail-grid,
+  body.module-pylontech .bms-body{
+    grid-template-columns:1fr!important;
+    gap:8px!important;
+  }
+  body.module-pylontech .bms-wall,
+  body.module-pylontech .diag-wall{
+    grid-template-columns:1fr!important;
+    gap:8px!important;
+  }
+  body.module-pylontech .bms-main-grid,
+  body.module-pylontech .bms-cells,
+  body.module-pylontech .pylon-side-top{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:7px!important;
+  }
+  body.module-pylontech .bms-pack{padding:9px!important;border-radius:16px!important}
+  body.module-pylontech .bms-head{gap:8px!important;align-items:flex-start!important;flex-wrap:wrap!important}
+  body.module-pylontech .bms-title{font-size:17px!important}
+  body.module-pylontech .card,
+  body.module-pylontech .bms-kpi,
+  body.module-pylontech .cell-card,
+  body.module-pylontech .pylon-side-metric{
+    padding:8px!important;
+    min-height:70px!important;
+  }
+  body.module-pylontech .value,
+  body.module-pylontech .card .value,
+  body.module-pylontech .bms-kpi .value,
+  body.module-pylontech .cell-card .value{
+    font-size:18px!important;
+    line-height:1.08!important;
+  }
+  body.module-pylontech .label{font-size:9px!important;letter-spacing:.8px!important}
+  body.module-pylontech .small{font-size:10px!important}
+  body.module-pylontech .soc-ring{width:88px!important;height:116px!important}
+  body.module-pylontech .soc-ring::before{width:32px!important;height:12px!important;top:-13px!important}
+  body.module-pylontech .soc-ring-inner .value{font-size:15px!important}
+  body.module-pylontech .history-modal{padding:6px!important;align-items:flex-start!important;overflow:auto!important}
+  body.module-pylontech .history-box{width:100%!important;max-width:100%!important;border-radius:16px!important}
+  body.module-pylontech .history-body{padding:10px!important}
+  body.module-pylontech .history-svg{height:300px!important}
+}
+@media(max-width:420px){
+  body.module-pylontech .bms-main-grid,
+  body.module-pylontech .bms-cells,
+  body.module-pylontech .pylon-side-top{grid-template-columns:1fr!important}
+}
+
+
+
+/* ===== PYLONTECH_MOBILE_DETAIL_AND_BATTERY_V4 ===== */
+@media(max-width:760px){
+  body.module-pylontech.pylon-battery-detail-active #bms_summary{
+    display:none!important;
+  }
+  body.module-pylontech.pylon-battery-detail-active #bms_summary + br{
+    display:none!important;
+  }
+}
+.sv-soc-wrap{display:grid!important;gap:9px!important;justify-items:center!important;align-content:start!important}
+.sv-soc-wrap .sv-scale-bar{display:none!important}
+.soc-ring{
+  position:relative!important;
+  width:118px!important;
+  height:156px!important;
+  border-radius:28px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  margin:8px auto 0!important;
+  padding:9px!important;
+  background:linear-gradient(180deg,#28364e 0%,#162235 52%,#10192a 100%)!important;
+  border:1px solid rgba(148,180,220,.28)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 0 2px rgba(81,108,150,.16),0 16px 40px rgba(0,0,0,.28),0 0 24px rgba(70,125,210,.14)!important;
+  overflow:visible!important;
+}
+.soc-ring::before{
+  content:"";
+  position:absolute;
+  top:-17px;
+  left:50%;
+  transform:translateX(-50%);
+  width:44px;
+  height:16px;
+  border-radius:7px 7px 9px 9px;
+  background:linear-gradient(180deg,#dfe9f5 0%,#96a7bf 45%,#6c7f9b 100%);
+  border:1px solid rgba(188,204,225,.55);
+  box-shadow:0 4px 12px rgba(0,0,0,.18);
+}
+.soc-ring::after{
+  content:"";
+  position:absolute;
+  inset:-6px;
+  border-radius:34px;
+  border:1px solid rgba(109,140,188,.22);
+  box-shadow:0 0 0 1px rgba(94,120,160,.08),inset 0 0 18px rgba(255,255,255,.03);
+  pointer-events:none;
+}
+.soc-ring-inner{
+  position:relative!important;
+  width:100%!important;
+  height:100%!important;
+  border-radius:21px!important;
+  background:linear-gradient(180deg,#0a1323 0%,#101c30 100%)!important;
+  border:1px solid rgba(111,143,188,.20)!important;
+  overflow:hidden!important;
+  display:block!important;
+}
+.soc-fill{
+  position:absolute;
+  left:8px;
+  right:8px;
+  bottom:8px;
+  border-radius:16px;
+  min-height:14px;
+  box-shadow:0 0 18px rgba(87,255,143,.34),inset 0 0 12px rgba(255,255,255,.15);
+}
+.soc-fill::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  background:linear-gradient(90deg,rgba(255,255,255,.12),transparent 38%,rgba(255,255,255,.08) 68%,transparent 100%);
+  pointer-events:none;
+}
+.soc-gloss{
+  position:absolute;
+  top:10px;
+  left:14px;
+  right:14px;
+  height:26px;
+  border-radius:14px;
+  background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,0));
+  pointer-events:none;
+}
+.soc-center{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  z-index:2;
+}
+.soc-ring-inner .value{
+  font-size:18px!important;
+  line-height:1!important;
+  color:#f5fff4!important;
+  text-shadow:0 2px 10px rgba(0,0,0,.34),0 0 10px rgba(120,255,158,.24)!important;
+}
+.soc-battery-label{
+  font-size:11px!important;
+  letter-spacing:3px!important;
+  text-transform:lowercase!important;
+  color:#f2f6ff!important;
+}
+@media(max-width:760px){
+  body.module-pylontech .soc-ring{width:88px!important;height:116px!important;margin-top:12px!important}
+  body.module-pylontech .soc-ring::before{width:32px!important;height:12px!important;top:-13px!important}
+  body.module-pylontech .soc-ring-inner .value{font-size:15px!important}
+  body.module-pylontech .soc-battery-label{font-size:10px!important;letter-spacing:2px!important}
+}
+@media(max-width:420px){
+  body.module-pylontech .soc-ring{width:84px!important;height:112px!important}
+}
+
+</style>
+<style>
+body.module-pylontech #jkbms .card.pylon-missing{display:none}
+@media(max-width:760px){
+  body.module-pylontech #jkbms .label,
+  body.module-pylontech #jkbms .small,
+  body.module-pylontech #jkbms .soc-battery-label{font-size:12px!important;line-height:1.3!important;letter-spacing:.02em!important}
+  body.module-pylontech #jkbms .value{font-size:20px!important;line-height:1.2!important;overflow-wrap:anywhere}
+  body.module-pylontech #bms_summary,
+  body.module-pylontech #jkbms .cards4,
+  body.module-pylontech #jkbms .diag-wow{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  /* Ces valeurs sont deja dans le resume en haut de page. */
+  body.module-pylontech #jkbms .pylon-bank-hero>.cards4{display:none!important}
+  /* Detail des cellules : disponible dans l'onglet de chaque batterie. */
+  body.module-pylontech #jkbms .bms-wall .bms-cells{display:none!important}
+  body.module-pylontech #jkbms .bms-subnav{flex-wrap:nowrap!important;overflow-x:auto!important}
+  body.module-pylontech #jkbms .bms-detail-nav{flex-wrap:wrap!important;overflow:visible!important}
+  body.module-pylontech #jkbms .bms-subtab,
+  body.module-pylontech #jkbms .bms-detail-tab{font-size:14px!important;min-height:44px!important;flex:0 0 auto!important}
+}
+</style>
+</head>
+<body class="module-pylontech">
+<div class="app"><div class="shell">
+<aside class="sidebar"><div class="brand"><span class="bolt">🔋</span><span>Smart<br>Pylontech</span></div><div class="premium">Premium actif<br><span id="pylon_count_side">--</span> batteries en ligne</div><div class="nav" id="main_nav"><button class="tab active" onclick="showTab('jkbms',this)">🔋 Pylontech</button></div></aside>
+<main class="main"><div class="topbar"><div class="left-title"><h1>Smart Pylontech</h1><span class="premium-pill">PREMIUM</span><div class="pill ok" id="system_pill">● Système OK</div><div class="pill" id="clock">--:--:--</div></div><div class="statusbar"><button class="pill" onclick="location.reload()">↻ RAFRAÎCHIR</button></div></div>
+<section id="jkbms" class="view active">
+  <div class="panel">
+    <div class="title">🔋 Pylontech <span class="live">Batteries live</span></div>
+    <div class="bms-subnav" id="bms_subnav"></div>
+    <div class="cards4" id="bms_summary"></div>
+    <br>
+    <div id="bms_cards"></div>
+  </div>
+</section>
+</main></div><div class="footer"><span>Dernière mise à jour : <span id="last_update">--</span></span><span>👤 Smart Pylontech Dashboard Premium</span><span>🟢 Données temps réel via Home Assistant</span></div></div>
+
+<div id="history_modal" class="history-modal" onclick="if(event.target===this)closeMiniHistory()">
+  <div class="history-box">
+    <div class="history-head">
+      <div><div class="history-title" id="history_title">Entité</div><div class="history-sub" id="history_sub">Valeur actuelle</div></div>
+      <button class="history-close" onclick="closeMiniHistory()">×</button>
+    </div>
+    <div class="history-body" id="history_body"><div class="history-empty">Chargement...</div></div>
+  </div>
+</div>
+
+<script>
+let WS=null, STATES={}, HA_TOKEN=null;
+let PYLON_VIEW='overview';
+let PYLON_DETAIL_TAB={};
+let RENDER_SIG='';
+const MAX_PACKS=15;
+const BAD_STATES=new Set(['unknown','unavailable','none','null','undefined','','nan']);
+const BANK_ENTITY_MAP={
+  packs_present:['sensor.pylontech_bank_packs_present','sensor.pylontech_battery_bank_packs_present','sensor.battery_bank_packs_present'],
+  packs_online:['sensor.pylontech_bank_packs_online','sensor.pylontech_battery_bank_packs_online','sensor.battery_bank_packs_online'],
+  soc_avg:['sensor.pylontech_bank_soc_avg','sensor.pylontech_bank_soc_average','sensor.pylontech_bank_state_of_charge','sensor.pylontech_bank_soc','sensor.pylontech_battery_bank_soc_avg','sensor.pylontech_battery_bank_state_of_charge','sensor.pylontech_battery_bank_soc'],
+  soc_min:['sensor.pylontech_bank_soc_min','sensor.pylontech_battery_bank_soc_min'],
+  soc_max:['sensor.pylontech_bank_soc_max','sensor.pylontech_battery_bank_soc_max'],
+  power_total:['sensor.pylontech_bank_power_total','sensor.pylontech_bank_total_power','sensor.pylontech_bank_power','sensor.pylontech_battery_bank_power_total','sensor.pylontech_battery_bank_total_power','sensor.pylontech_battery_bank_power'],
+  current_total:['sensor.pylontech_bank_current_total','sensor.pylontech_bank_total_current','sensor.pylontech_bank_current','sensor.pylontech_battery_bank_current_total','sensor.pylontech_battery_bank_total_current','sensor.pylontech_battery_bank_current'],
+  voltage_avg:['sensor.pylontech_bank_voltage_avg','sensor.pylontech_bank_average_voltage','sensor.pylontech_bank_voltage','sensor.pylontech_battery_bank_voltage_avg','sensor.pylontech_battery_bank_average_voltage','sensor.pylontech_battery_bank_voltage'],
+  state:['sensor.pylontech_bank_state','sensor.pylontech_bank_battery_state','sensor.pylontech_bank_base_state','sensor.pylontech_battery_bank_state','sensor.pylontech_battery_bank_battery_state','sensor.pylontech_battery_bank_base_state'],
+  model:['sensor.pylontech_system_model','sensor.pylontech_model','sensor.pylontech_detected_model'],
+  transport:['sensor.pylontech_transport','sensor.pylontech_connection_mode','sensor.pylontech_gateway_status']
+};
+const SLUG_ALIASES={
+  voltage:['voltage','battery_voltage','tension'],
+  current:['current','battery_current','courant'],
+  power:['power','battery_power','puissance'],
+  temp:['temp','temperature','battery_temperature'],
+  soc:['soc','state_of_charge','soc_pourcentage','capacity'],
+  state:['state','battery_state','base_state','status'],
+  cycles:['cycles','cycle_count','nombre_cycle'],
+  soh:['soh','state_of_health','soh_pourcentage','soh_times'],
+  charge_capacity:['charge_capacity','charge_cap','remain_charge_capacity','remaining_capacity'],
+  discharge_capacity:['discharge_capacity','discharge_cap'],
+  temp_low:['temp_low','temperature_low','min_temperature'],
+  temp_high:['temp_high','temperature_high','max_temperature'],
+  alarm_summary:['alarm_summary','alarm','alarms','warning_summary'],
+  transport:['transport','connection_transport','communication_transport'],
+  cell_v_min:['cell_v_min','cell_voltage_low','cell_voltage_min','cell_voltage_min_value'],
+  cell_v_max:['cell_v_max','cell_voltage_high','cell_voltage_max','cell_voltage_max_value'],
+  cell_delta_mv:['cell_delta_mv','cell_voltage_delta_mv','cell_delta'],
+  cell_delta_v:['cell_delta_v','cell_voltage_delta'],
+  device_name:['device_name','battery_model','model'],
+  barcode:['barcode','serial','serial_number'],
+  release_date:['release_date','manufacturing_date'],
+  board_version:['board_version'],
+  board:['board'],
+  main_soft:['main_soft','main_software'],
+  soft_version:['soft_version','software_version'],
+  boot_version:['boot_version'],
+  comm_version:['comm_version'],
+  spec:['spec','specification'],
+  max_charge:['max_charge','max_charge_current'],
+  max_discharge:['max_discharge','max_dischg','max_discharge_current'],
+  epon_baud:['epon_baud'],
+  console_baud:['console_baud'],
+  basic_status:['basic_status'],
+  volt_status:['volt_status','voltage_status'],
+  current_status:['current_status'],
+  tmpr_status:['tmpr_status','temperature_status'],
+  coul_status:['coul_status','coulomb_status'],
+  soh_status:['soh_status'],
+  heater_status:['heater_status'],
+  last_seen:['last_seen','last_update','last_seen_iso','timestamp']
+};
+function $(id){return document.getElementById(id)}
+function bad(v){return BAD_STATES.has(String(v??'').trim().toLowerCase())}
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function nn(i){return String(i).padStart(2,'0')}
+function has(id){return !!(id && Object.prototype.hasOwnProperty.call(STATES,id))}
+function first(ids){return (ids||[]).find(has)}
+function state(ids,def='--'){ids=Array.isArray(ids)?ids:[ids];for(const id of ids){const st=STATES[id];if(st&&!bad(st.state))return st.state}return def}
+function num(ids,def=NaN){const v=state(ids,def);const n=Number(String(v).replace(',','.'));return Number.isFinite(n)?n:def}
+function fmt(v,d=2){v=Number(v);return Number.isFinite(v)?v.toFixed(d):'--'}
+function round(v){v=Number(v);return Number.isFinite(v)?String(Math.round(v)):'--'}
+function pct(v){v=Number(v);return Number.isFinite(v)?Math.max(0,Math.min(100,v)):0}
+function set(id,v){const e=$(id);if(e)e.textContent=v}
+
+function withNumericSuffixes(ids,max=8){
+  const out=[];
+  (ids||[]).forEach(id=>{
+    if(!id)return;
+    out.push(id);
+    for(let n=2;n<=max;n++)out.push(`${id}_${n}`);
+  });
+  return [...new Set(out)];
+}
+function cleanTail(t){return String(t||'').toLowerCase().replace(/_\d+$/,'')}
+function resolvePackEntity(i,slug){
+  const aliases=slugList(slug).map(cleanTail);
+  const exact=first(withNumericSuffixes(pylonCandidatesBase(i,slug)));
+  if(exact)return exact;
+  const packRe=new RegExp(`^sensor\\.pylontech_(?:batt|battery)_0?${Number(i)}_(.+)$`,'i');
+  let best=null, bestScore=-1;
+  for(const id of Object.keys(STATES||{})){
+    const m=id.match(packRe);
+    if(!m)continue;
+    const tail=cleanTail(m[1]);
+    let score=-1;
+    for(const a of aliases){
+      if(tail===a)score=Math.max(score,100);
+      else if(tail===`battery_${a}`)score=Math.max(score,95);
+    }
+    if(score<0)continue;
+    if(['voltage','current','power','temp','soc','state','cycles','soh'].includes(slug) && tail.includes('cell_'))continue;
+    const st=STATES[id];
+    if(st && !bad(st.state))score+=5;
+    if(score>bestScore){bestScore=score;best=id}
+  }
+  return best;
+}
+function resolveBankEntity(slug){
+  const bases=BANK_ENTITY_MAP[slug]||[];
+  const exact=first(withNumericSuffixes(bases));
+  if(exact)return exact;
+  const aliasParts=bases.map(id=>id.replace(/^sensor\./,'').toLowerCase().replace(/^pylontech_(battery_)?bank_/,'')).map(cleanTail);
+  let best=null,bestScore=-1;
+  for(const id of Object.keys(STATES||{})){
+    const lid=id.toLowerCase();
+    if(!lid.startsWith('sensor.pylontech_') || !lid.includes('bank'))continue;
+    const tail=cleanTail(lid.replace(/^sensor\.pylontech_(battery_)?bank_/,''));
+    let score=-1;
+    for(const a of aliasParts){
+      if(tail===a)score=Math.max(score,100);
+      else if(tail.endsWith('_'+a))score=Math.max(score,80);
+    }
+    if(score<0)continue;
+    const st=STATES[id];
+    if(st && !bad(st.state))score+=5;
+    if(score>bestScore){bestScore=score;best=id}
+  }
+  return best;
+}
+function bankEntity(slug){return resolveBankEntity(slug) || (BANK_ENTITY_MAP[slug]||[])[0] || ''}
+function bankNum(slug){const e=bankEntity(slug); return e?num([e]):NaN}
+function bankState(slug,def='--'){const e=bankEntity(slug); return e?state([e],def):def}
+function slugList(slug){return SLUG_ALIASES[slug]||[slug]}
+function pylonCandidatesBase(i,slug){
+  const out=[]; const k=String(i); const p=nn(i);
+  for(const s of slugList(slug)){
+    out.push(`sensor.pylontech_batt_${p}_${s}`);
+    out.push(`sensor.pylontech_battery_${k}_${s}`);
+    out.push(`sensor.pylontech_battery_${p}_${s}`);
+    out.push(`sensor.pylontech_batt_${k}_${s}`);
+  }
+  return [...new Set(out)];
+}
+function pylonCandidates(i,slug){return withNumericSuffixes(pylonCandidatesBase(i,slug))}
+function pEnt(i,slug){return resolvePackEntity(i,slug) || pylonCandidatesBase(i,slug)[0]}
+function pState(i,slug,def='--'){const e=pEnt(i,slug); return e?state([e],def):def}
+function pNum(i,slug){const e=pEnt(i,slug); return e?num([e]):NaN}
+function cellEnt(i,c,kind='voltage'){
+  const p=nn(i), cc=nn(c);
+  const bases=[`sensor.pylontech_batt_${p}_cell_${cc}_${kind}`,`sensor.pylontech_battery_${i}_cell_${cc}_${kind}`,`sensor.pylontech_battery_${i}_cell_${c}_${kind}`];
+  const exact=first(withNumericSuffixes(bases)); if(exact)return exact;
+  const re=new RegExp(`^sensor\\.pylontech_(?:batt|battery)_0?${Number(i)}_cell_0?${Number(c)}_${kind}(?:_\\d+)?$`,'i');
+  return Object.keys(STATES||{}).find(id=>re.test(id)) || bases[0];
+}
+function cellNum(i,c,kind='voltage'){return num([cellEnt(i,c,kind)])}
+function clickAttrs(entity){return entity?` onclick="event.stopPropagation();moreInfo('${entity}')" role="button" tabindex="0" title="Ouvrir ${entity}"`:''}
+function card(label,value,unit,klass='',entity=''){const missing=entity&&!has(entity)?' pylon-missing':'';return `<div class="card ${klass}${missing} clickable"${clickAttrs(entity)}><div class="label">${label}</div><div class="value">${value}</div><div class="small">${unit||''}</div>${entity?`<div class="pylon-mini-entity">${entity}${has(entity)?'':' · absent'}</div>`:''}</div>`}
+function bar(value,min,max){value=Number(value);if(!Number.isFinite(value))value=min;const p=Math.max(0,Math.min(100,(value-min)/(max-min)*100));return `<div class="sv-scale-bar"><div class="sv-scale-fill" style="width:${p}%"></div></div>`}
+function socRing(soc){const p=pct(soc); const color=p<=20?'linear-gradient(180deg,#ff7a7a 0%,#ef4444 100%)':(p<=50?'linear-gradient(180deg,#ffd86b 0%,#f59e0b 100%)':'linear-gradient(90deg,#2ee85c 0%,#62f56d 48%,#25d94f 100%)'); return `<div class="sv-soc-wrap"><div class="soc-ring"><div class="soc-ring-inner"><div class="soc-fill" style="height:${Math.max(10,p)}%; background:${color};"></div><div class="soc-gloss"></div><div class="soc-center"><div class="value">${Math.round(p)}%</div></div></div></div><div class="small soc-battery-label">soc</div></div>`}
+function statusFromCurrent(amps){amps=Number(amps);if(amps>0.2)return ['CHARGE','bms-positive'];if(amps<-0.2)return ['DÉCHARGE','bms-negative'];return ['STANDBY','bms-blue']}
+function packHasData(i){return ['soc','voltage','current','power','temp','state','cell_v_min','cell_v_max'].some(s=>has(pEnt(i,s))&&!bad(state([pEnt(i,s)],'')))}
+function getPackIds(){
+  const present=bankNum('packs_present');
+  if(Number.isFinite(present)&&present>0){
+    return Array.from({length:Math.min(MAX_PACKS,Math.round(present))},(_,k)=>k+1);
+  }
+  const ids=[];
+  for(let i=1;i<=MAX_PACKS;i++){
+    if(packHasData(i))ids.push(i);
+  }
+  return ids;
+}
+function computedBank(){
+  const ids=getPackIds();
+  const socVals=ids.map(i=>pNum(i,'soc')).filter(Number.isFinite);
+  const voltVals=ids.map(i=>pNum(i,'voltage')).filter(Number.isFinite);
+  const currentVals=ids.map(i=>pNum(i,'current')).filter(Number.isFinite);
+  const powerVals=ids.map(i=>pNum(i,'power')).filter(Number.isFinite);
+  const deltaVals=ids.map(i=>{let mv=pNum(i,'cell_delta_mv'); if(Number.isFinite(mv))return mv; let v=pNum(i,'cell_delta_v'); return Number.isFinite(v)?v*1000:NaN}).filter(Number.isFinite);
+  return {
+    packs:ids.length,
+    online:Number.isFinite(bankNum('packs_online'))?bankNum('packs_online'):ids.filter(packHasData).length,
+    soc:Number.isFinite(bankNum('soc_avg'))?bankNum('soc_avg'):(socVals.length?socVals.reduce((a,b)=>a+b,0)/socVals.length:NaN),
+    voltage:Number.isFinite(bankNum('voltage_avg'))?bankNum('voltage_avg'):(voltVals.length?voltVals.reduce((a,b)=>a+b,0)/voltVals.length:NaN),
+    current:Number.isFinite(bankNum('current_total'))?bankNum('current_total'):(currentVals.length?currentVals.reduce((a,b)=>a+b,0):NaN),
+    power:Number.isFinite(bankNum('power_total'))?bankNum('power_total'):(powerVals.length?powerVals.reduce((a,b)=>a+b,0):NaN),
+    socMin:Number.isFinite(bankNum('soc_min'))?bankNum('soc_min'):(socVals.length?Math.min(...socVals):NaN),
+    socMax:Number.isFinite(bankNum('soc_max'))?bankNum('soc_max'):(socVals.length?Math.max(...socVals):NaN),
+    deltaMax:deltaVals.length?Math.max(...deltaVals):NaN,
+    state:bankState('state','--'),
+  };
+}
+function renderSummary(){
+  const b=computedBank();
+  $('bms_summary').innerHTML=[
+    card('Batteries en ligne', `${round(b.online)}/${round(Number.isFinite(bankNum('packs_present'))?bankNum('packs_present'):b.packs)}`, 'packs', 'bat', bankEntity('packs_online')),
+    card('SOC moyen', fmt(b.soc,1), '%', b.soc<=20?'red':'bat', bankEntity('soc_avg')),
+    card('Puissance totale', round(b.power), 'W', b.power<0?'red':'load', bankEntity('power_total')),
+    card('Courant total', fmt(b.current,2), 'A', b.current<0?'red':'bat', bankEntity('current_total')),
+    card('Tension moyenne', fmt(b.voltage,2), 'V', 'blue', bankEntity('voltage_avg')),
+    card('Delta max', fmt(b.deltaMax,1), 'mV', b.deltaMax>50?'orange':'blue', ''),
+    card('SOC min/max', `${fmt(b.socMin,0)} / ${fmt(b.socMax,0)}`, '%', 'orange', bankEntity('soc_min')),
+    card('État banque', esc(b.state), '', String(b.state).toLowerCase().includes('alarm')?'red':'bat', bankEntity('state'))
+  ].join('');
+  set('pylon_count_side', round(b.online)); set('last_update', new Date().toLocaleTimeString()); set('clock', new Date().toLocaleTimeString());
+}
+function renderSubnav(ids){
+  const b=computedBank();
+  const buttons=[];
+  const btn=(id,label)=>`<button class="bms-subtab ${PYLON_VIEW===id?'active':''}" onclick="PYLON_VIEW='${id}';renderDashboard(true)">${label}</button>`;
+  buttons.push(btn('overview','🌐 Vue globale'));
+  ids.forEach(i=>buttons.push(btn(String(i),`🔋 Batterie ${i}`)));
+  buttons.push(btn('diagnostic','🩺 Diagnostic'));
+  $('bms_subnav').innerHTML=buttons.join('');
+}
+function renderBankHero(){
+  const b=computedBank();
+  const status=statusFromCurrent(b.current);
+  return `<div class="pylon-bank-hero"><div class="pylon-bank-card">${socRing(b.soc)}<div class="label">BANQUE PYLONTECH</div><div class="value big">${fmt(b.soc,1)}%</div><div class="small">SOC moyen · ${round(b.online)} batteries online</div><div class="pylon-statusline"><span class="pylon-status-chip">${status[0]}</span><span class="pylon-status-chip">${fmt(b.voltage,2)} V</span><span class="pylon-status-chip">${round(b.power)} W</span><span class="pylon-status-chip">Δ ${fmt(b.deltaMax,1)} mV</span></div></div><div class="cards4">${
+    card('Packs présents', round(Number.isFinite(bankNum('packs_present'))?bankNum('packs_present'):b.packs), '', 'bat', bankEntity('packs_present'))+
+    card('Packs online', round(b.online), '', 'bat', bankEntity('packs_online'))+
+    card('SOC minimum', fmt(b.socMin,0), '%', b.socMin<20?'red':'orange', bankEntity('soc_min'))+
+    card('SOC maximum', fmt(b.socMax,0), '%', 'bat', bankEntity('soc_max'))+
+    card('Tension moyenne', fmt(b.voltage,2), 'V', 'blue', bankEntity('voltage_avg'))+
+    card('Courant total', fmt(b.current,2), 'A', b.current<0?'red':'bat', bankEntity('current_total'))+
+    card('Puissance totale', round(b.power), 'W', b.power<0?'red':'load', bankEntity('power_total'))+
+    card('État global', esc(b.state), '', 'blue', bankEntity('state'))
+  }</div></div>`;
+}
+function compactLong(v){
+  let s=String(v??'--').trim();
+  if(!s || bad(s))return '--';
+  return s.replace(/\s*,\s*/g,' · ');
+}
+function renderPackCard(i){
+  const soc=pNum(i,'soc'), volt=pNum(i,'voltage'), amps=pNum(i,'current'), watts=Number.isFinite(pNum(i,'power'))?pNum(i,'power'):(volt*amps);
+  const temp=pNum(i,'temp'), cycles=pNum(i,'cycles'), soh=pNum(i,'soh'), stateTxt=pState(i,'state','--');
+  const tempLow=pNum(i,'temp_low'), tempHigh=pNum(i,'temp_high');
+  const alarmTxt=pState(i,'alarm_summary','--'), transportTxt=pState(i,'transport','--'), lastSeenTxt=pState(i,'last_seen','--');
+  const minv=pNum(i,'cell_v_min'), maxv=pNum(i,'cell_v_max');
+  let deltamv=pNum(i,'cell_delta_mv'); if(!Number.isFinite(deltamv)){const dv=pNum(i,'cell_delta_v'); if(Number.isFinite(dv))deltamv=dv*1000;}
+  const [status,statusClass]=statusFromCurrent(amps);
+  return `<div class="bms-pack clickable" onclick="PYLON_VIEW='${i}';renderDashboard(true)">
+    <div class="bms-head"><div class="bms-title"><div class="bms-title-icon">🔋</div><div>Pylontech ${i}<div class="small">Clique pour ouvrir les sous-vues</div></div></div><div class="bms-pill">${status}</div></div>
+    <div class="bms-body">${socRing(soc)}<div class="bms-main-grid">
+      <div class="bms-kpi bms-positive clickable"${clickAttrs(pEnt(i,'voltage'))}><div class="label">Tension</div><div class="value">${fmt(volt,2)}</div><div class="small">V total</div>${bar(volt,40,58.4)}</div>
+      <div class="bms-kpi ${statusClass} clickable"${clickAttrs(pEnt(i,'power'))}><div class="label">Puissance</div><div class="value">${round(watts)}</div><div class="small">W</div>${bar(Math.abs(watts),0,5000)}</div>
+      <div class="bms-kpi ${amps>=0?'bms-positive':'bms-negative'} clickable"${clickAttrs(pEnt(i,'current'))}><div class="label">Courant</div><div class="value">${fmt(amps,2)}</div><div class="small">A</div>${bar(amps,-100,100)}</div>
+      <div class="bms-kpi bms-blue clickable"${clickAttrs(pEnt(i,'temp'))}><div class="label">Température</div><div class="value">${fmt(temp,1)}</div><div class="small">°C</div>${bar(temp,0,60)}</div>
+      <div class="bms-kpi ${deltamv>50?'bms-warn':'bms-blue'} clickable"${clickAttrs(pEnt(i,'cell_delta_mv'))}><div class="label">Delta cell</div><div class="value">${fmt(deltamv,1)}</div><div class="small">mV</div>${bar(deltamv,0,100)}</div>
+      <div class="bms-kpi bms-warn clickable"${clickAttrs(pEnt(i,'cycles'))}><div class="label">Cycles</div><div class="value">${round(cycles)}</div><div class="small">cycles</div>${bar(cycles,0,8000)}</div>
+    </div></div>
+    <div class="bms-cells">
+      <div class="cell-card bms-positive clickable"${clickAttrs(pEnt(i,'cell_v_min'))}><div class="label">Cell min</div><div class="value">${fmt(minv,3)}</div><div class="small">V</div>${bar(minv,2.5,3.65)}</div>
+      <div class="cell-card bms-negative clickable"${clickAttrs(pEnt(i,'cell_v_max'))}><div class="label">Cell max</div><div class="value">${fmt(maxv,3)}</div><div class="small">V</div>${bar(maxv,2.5,3.65)}</div>
+      <div class="cell-card bms-blue clickable"${clickAttrs(pEnt(i,'soh'))}><div class="label">SOH</div><div class="value">${round(soh)}</div><div class="small">%</div>${bar(soh,0,100)}</div>
+      <div class="cell-card ${String(stateTxt).toLowerCase().includes('alarm')?'bms-negative':'bms-blue'} clickable"${clickAttrs(pEnt(i,'state'))}><div class="label">État batterie</div><div class="value" style="font-size:18px">${esc(stateTxt)}</div><div class="small">status</div></div>
+      <div class="cell-card ${alarmClass(alarmTxt)} clickable"${clickAttrs(pEnt(i,'alarm_summary'))}><div class="label">Alarmes</div><div class="value" style="font-size:18px">${esc(compactLong(alarmTxt))}</div><div class="small">résumé</div></div>
+      <div class="cell-card bms-blue clickable"${clickAttrs(pEnt(i,'temp_low'))}><div class="label">Temp min/max</div><div class="value" style="font-size:18px">${fmt(tempLow,1)} / ${fmt(tempHigh,1)}</div><div class="small">°C</div></div>
+      <div class="cell-card bms-blue clickable"${clickAttrs(pEnt(i,'transport'))}><div class="label">Transport</div><div class="value" style="font-size:18px">${esc(transportTxt)}</div><div class="small">${esc(lastSeenTxt)}</div></div>
+    </div>
+  </div>`;
+}
+function renderOverview(ids){
+  if(!ids.length)return `<div class="pylon-empty">Aucune entité Pylontech détectée pour l’instant.<br><span class="small">Attendu : sensor.pylontech_batt_01_soc, sensor.pylontech_batt_01_voltage, etc.</span></div>`;
+  return renderBankHero()+`<div class="bms-wall">${ids.map(renderPackCard).join('')}</div>`;
+}
+function detailTabs(i){
+  const tab=PYLON_DETAIL_TAB[i]||'resume';
+  const b=(id,label)=>`<button class="bms-detail-tab ${tab===id?'active':''}" onclick="PYLON_DETAIL_TAB[${i}]='${id}';renderDashboard(true)">${label}</button>`;
+  return `<div class="bms-detail-nav">${b('resume','📊 Résumé')}${b('cells','⚡ Cellules')}${b('info','ℹ️ Infos')}${b('states','🩺 États')}</div>`;
+}
+function renderPackSideCard(i){
+  const soc=pNum(i,'soc'), volt=pNum(i,'voltage'), amps=pNum(i,'current'), watts=Number.isFinite(pNum(i,'power'))?pNum(i,'power'):(volt*amps);
+  const temp=pNum(i,'temp'), cycles=pNum(i,'cycles'), soh=pNum(i,'soh');
+  const stateTxt=pState(i,'state','--');
+  const alarmTxt=compactLong(pState(i,'alarm_summary','--'));
+  const lastSeenTxt=pState(i,'last_seen','--');
+  const [status]=statusFromCurrent(amps);
+  return `<div class="pylon-side-card">
+    <div class="bms-head"><div class="bms-title"><div class="bms-title-icon">🔋</div><div>Pylontech ${i}<div class="small">Résumé rapide</div></div></div><div class="bms-pill">${status}</div></div>
+    ${socRing(soc)}
+    <div class="pylon-statusline"><span class="pylon-status-chip">${esc(stateTxt)}</span><span class="pylon-status-chip">${fmt(volt,2)} V</span><span class="pylon-status-chip">${fmt(temp,1)} °C</span></div>
+    <div class="pylon-side-top">
+      <div class="pylon-side-metric clickable${(!has(pEnt(i,'power'))?' pylon-missing':'')}"${clickAttrs(pEnt(i,'power'))}><div class="label">Puissance</div><div class="value">${round(watts)}</div><div class="small">W</div></div>
+      <div class="pylon-side-metric clickable${(!has(pEnt(i,'current'))?' pylon-missing':'')}"${clickAttrs(pEnt(i,'current'))}><div class="label">Courant</div><div class="value">${fmt(amps,2)}</div><div class="small">A</div></div>
+      <div class="pylon-side-metric clickable${(!has(pEnt(i,'cycles'))?' pylon-missing':'')}"${clickAttrs(pEnt(i,'cycles'))}><div class="label">Cycles</div><div class="value">${round(cycles)}</div><div class="small">cycles</div></div>
+      <div class="pylon-side-metric clickable${(!has(pEnt(i,'soh'))?' pylon-missing':'')}"${clickAttrs(pEnt(i,'soh'))}><div class="label">SOH</div><div class="value">${round(soh)}</div><div class="small">%</div></div>
+    </div>
+    <div class="pylon-alarm-box clickable${(!has(pEnt(i,'alarm_summary'))?' pylon-missing':'')}"${clickAttrs(pEnt(i,'alarm_summary'))}><div class="label">Alarmes</div><div class="value">${esc(alarmTxt)}</div><div class="small">${esc(lastSeenTxt)}</div><div class="pylon-mini-entity">${esc(pEnt(i,'alarm_summary'))}</div></div>
+  </div>`
+}
+function renderPackResume(i){return `<div class="pylon-detail-grid"><div class="pylon-detail-side">${renderPackSideCard(i)}</div><div class="cards4">${
+  card('Tension',fmt(pNum(i,'voltage'),2),'V','bat',pEnt(i,'voltage'))+
+  card('SOC',fmt(pNum(i,'soc'),0),'%','bat',pEnt(i,'soc'))+
+  card('Courant',fmt(pNum(i,'current'),2),'A',pNum(i,'current')<0?'red':'bat',pEnt(i,'current'))+
+  card('Puissance',round(pNum(i,'power')),'W',pNum(i,'power')<0?'red':'load',pEnt(i,'power'))+
+  card('Température moyenne',fmt(pNum(i,'temp'),1),'°C','orange',pEnt(i,'temp'))+
+  card('Température basse',fmt(pNum(i,'temp_low'),1),'°C','blue',pEnt(i,'temp_low'))+
+  card('Température haute',fmt(pNum(i,'temp_high'),1),'°C',pNum(i,'temp_high')>45?'red':'orange',pEnt(i,'temp_high'))+
+  card('Cycles',round(pNum(i,'cycles')),'cycles','orange',pEnt(i,'cycles'))+
+  card('SOH',round(pNum(i,'soh')),'%','blue',pEnt(i,'soh'))+
+  card('État',esc(pState(i,'state')),'',stateClass(pState(i,'state')),pEnt(i,'state'))+
+  card('Alarmes',esc(compactLong(pState(i,'alarm_summary'))),'',alarmClass(pState(i,'alarm_summary')),pEnt(i,'alarm_summary'))+
+  card('Transport',esc(pState(i,'transport')),'','blue',pEnt(i,'transport'))+
+  card('Charge capacity',esc(pState(i,'charge_capacity')),'','blue',pEnt(i,'charge_capacity'))+
+  card('Discharge capacity',esc(pState(i,'discharge_capacity')),'','blue',pEnt(i,'discharge_capacity'))+
+  card('Cell min',fmt(pNum(i,'cell_v_min'),3),'V','bat',pEnt(i,'cell_v_min'))+
+  card('Cell max',fmt(pNum(i,'cell_v_max'),3),'V','red',pEnt(i,'cell_v_max'))+
+  card('Delta cell',fmt(Number.isFinite(pNum(i,'cell_delta_mv'))?pNum(i,'cell_delta_mv'):pNum(i,'cell_delta_v')*1000,1),'mV','blue',pEnt(i,'cell_delta_mv'))+
+  card('Dernier contact',esc(pState(i,'last_seen')),'','blue',pEnt(i,'last_seen'))
+}</div></div>`}
+function detectCellCount(i){let max=0;for(let c=1;c<=32;c++){if(has(cellEnt(i,c,'voltage'))||has(cellEnt(i,c,'temp')))max=c}return max}
+function renderCells(i){
+  const count=detectCellCount(i);
+  if(!count) return `<div class="pylon-empty">Détail cellule complet absent ou non activé côté discovery premium.<br>Pour US2000B, on affiche quand même les valeurs agrégées disponibles.<br><br><div class="cards4">${card('Cell min',fmt(pNum(i,'cell_v_min'),3),'V','bat',pEnt(i,'cell_v_min'))+card('Cell max',fmt(pNum(i,'cell_v_max'),3),'V','red',pEnt(i,'cell_v_max'))+card('Delta mV',fmt(Number.isFinite(pNum(i,'cell_delta_mv'))?pNum(i,'cell_delta_mv'):pNum(i,'cell_delta_v')*1000,1),'mV','orange',pEnt(i,'cell_delta_mv'))+card('Temp basse',fmt(pNum(i,'temp_low'),1),'°C','blue',pEnt(i,'temp_low'))+card('Temp haute',fmt(pNum(i,'temp_high'),1),'°C','orange',pEnt(i,'temp_high'))}</div></div>`;
+  let html='<div class="pylon-cell-wall">';
+  for(let c=1;c<=count;c++){const v=cellNum(i,c,'voltage'), t=cellNum(i,c,'temp'); html+=`<div class="pylon-cell-meter clickable"${clickAttrs(cellEnt(i,c,'voltage'))}><div class="cell-meter-head"><span>Cell ${c}</span><b>${fmt(v,3)} V</b></div>${bar(v,2.5,3.65)}<div class="small">Temp : ${fmt(t,1)} °C</div><div class="pylon-mini-entity">${cellEnt(i,c,'voltage')}</div></div>`}
+  return html+'</div>';
+}
+function renderInfo(i){
+  const defs=[['device_name','Nom appareil'],['barcode','Barcode'],['release_date','Release date'],['board_version','Board version'],['board','Board'],['main_soft','Main soft'],['soft_version','Soft version'],['boot_version','Boot version'],['comm_version','Comm version'],['spec','Specification'],['max_charge','Max charge'],['max_discharge','Max discharge'],['epon_baud','EPON baud'],['console_baud','Console baud'],['charge_capacity','Charge capacity'],['discharge_capacity','Discharge capacity'],['transport','Transport'],['last_seen','Dernier contact']];
+  return `<div class="pylon-info-wall">${defs.map(([s,l])=>{const ent=pEnt(i,s), val=pState(i,s,'--');return card(l,esc(val),'',has(ent)?'blue':'pylon-missing',ent)}).join('')}</div>`;
+}
+function stateClass(v){const s=String(v||'').toLowerCase(); if(/alarm|fault|protect|error|fail/.test(s))return 'pylon-fault'; if(/warn|high|low/.test(s))return 'pylon-warn'; if(/normal|ok|standby|charge|dischg|discharge/.test(s))return 'pylon-good'; return 'blue'}
+function alarmClass(v){const s=String(v||'').toLowerCase(); if(!s||s==='--')return 'blue'; if(/none|normal|ok|no alarm|no_alarm|clear/.test(s))return 'pylon-good'; if(/warn|high|low|protect/.test(s))return 'pylon-warn'; if(/alarm|fault|error|fail/.test(s))return 'pylon-fault'; return 'blue'}
+function bestValue(i,slugs,def='--'){for(const slug of slugs){const v=pState(i,slug,'');if(!bad(v))return v}return def}
+function bestNum(i,slugs){for(const slug of slugs){const v=pNum(i,slug);if(Number.isFinite(v))return v}return NaN}
+function renderStates(i){
+  const defs=[['state','Battery state'],['basic_status','Basic status'],['volt_status','Voltage status'],['current_status','Current status'],['tmpr_status','Temperature status'],['coul_status','Coulomb status'],['soh_status','SOH status'],['heater_status','Heater status'],['alarm_summary','Alarmes / warnings'],['temp_low','Temp basse'],['temp_high','Temp haute'],['transport','Transport'],['last_seen','Last seen']];
+  return `<div class="pylon-state-wall">${defs.map(([s,l])=>{const ent=pEnt(i,s), val=pState(i,s,'--');return card(l,esc(val),'',stateClass(val),ent)}).join('')}</div>`;
+}
+function renderPackDetail(i){
+  if(!packHasData(i))return `<div class="pylon-empty">Batterie ${i} non détectée.</div>`;
+  const tab=PYLON_DETAIL_TAB[i]||'resume';
+  let body=tab==='cells'?renderCells(i):(tab==='info'?renderInfo(i):(tab==='states'?renderStates(i):renderPackResume(i)));
+  return `<div class="bms-pack"><div class="bms-head"><div class="bms-title"><div class="bms-title-icon">🔋</div><div>Pylontech Batterie ${i}<div class="small">Sous-vues sans réglages</div></div></div><button class="bms-subtab" onclick="PYLON_VIEW='overview';renderDashboard(true)">← Retour</button></div>${detailTabs(i)}${body}</div>`;
+}
+function renderDiagnostic(ids){
+  const b=computedBank();
+  const sys=[
+    ['Packs présents',Number.isFinite(bankNum('packs_present'))?bankNum('packs_present'):ids.length,'',bankEntity('packs_present')],
+    ['Packs online',b.online,'',bankEntity('packs_online')],
+    ['Modèle détecté',bankState('model','--'),'',bankEntity('model')],
+    ['Transport',bankState('transport','--'),'',bankEntity('transport')],
+    ['État banque',b.state,'',bankEntity('state')],
+    ['Delta max calculé',fmt(b.deltaMax,1),'mV',''],
+  ];
+  let html='<div class="diag-wow">'+sys.map(([l,v,u,e])=>card(l,esc(v),u,'blue',e)).join('')+'</div>';
+  html+='<div class="diag-wall">';
+  ids.forEach(i=>{
+    html+=`<div class="diag-pack"><div class="diag-title"><span>🩺 Batterie ${i}</span><span class="diag-status-pill">${esc(pState(i,'state','Diagnostic'))}</span></div><div class="diag-grid">${
+      card('État batterie',esc(pState(i,'state')),'',stateClass(pState(i,'state')),pEnt(i,'state'))+
+      card('Basic status',esc(pState(i,'basic_status')),'',stateClass(pState(i,'basic_status')),pEnt(i,'basic_status'))+
+      card('Voltage status',esc(pState(i,'volt_status')),'',stateClass(pState(i,'volt_status')),pEnt(i,'volt_status'))+
+      card('Current status',esc(pState(i,'current_status')),'',stateClass(pState(i,'current_status')),pEnt(i,'current_status'))+
+      card('Temperature status',esc(pState(i,'tmpr_status')),'',stateClass(pState(i,'tmpr_status')),pEnt(i,'tmpr_status'))+
+      card('Coulomb status',esc(pState(i,'coul_status')),'',stateClass(pState(i,'coul_status')),pEnt(i,'coul_status'))+
+      card('SOH status',esc(pState(i,'soh_status')),'',stateClass(pState(i,'soh_status')),pEnt(i,'soh_status'))+
+      card('Heater status',esc(pState(i,'heater_status')),'',stateClass(pState(i,'heater_status')),pEnt(i,'heater_status'))+
+      card('Alarmes',esc(compactLong(pState(i,'alarm_summary'))),'',alarmClass(pState(i,'alarm_summary')),pEnt(i,'alarm_summary'))+
+      card('Temp basse',fmt(pNum(i,'temp_low'),1),'°C','blue',pEnt(i,'temp_low'))+
+      card('Temp haute',fmt(pNum(i,'temp_high'),1),'°C',pNum(i,'temp_high')>45?'red':'orange',pEnt(i,'temp_high'))+
+      card('Transport',esc(pState(i,'transport')),'','blue',pEnt(i,'transport'))+
+      card('Dernier contact',esc(pState(i,'last_seen')),'','blue',pEnt(i,'last_seen'))+
+      card('Barcode',esc(pState(i,'barcode')),'','blue',pEnt(i,'barcode'))+
+      card('Software',esc(pState(i,'soft_version')),'','blue',pEnt(i,'soft_version'))
+    }</div></div>`;
+  });
+  return html+'</div>';
+}
+function renderDashboard(force=false){
+  const ids=getPackIds();
+  if(PYLON_VIEW!=='overview'&&PYLON_VIEW!=='diagnostic'&&!ids.includes(Number(PYLON_VIEW)))PYLON_VIEW='overview';
+  const isBatteryDetail=(PYLON_VIEW!=='overview'&&PYLON_VIEW!=='diagnostic');
+  try{document.body.classList.toggle('pylon-battery-detail-active',isBatteryDetail)}catch(e){}
+  const sig=JSON.stringify({ids,view:PYLON_VIEW,tab:PYLON_DETAIL_TAB[PYLON_VIEW],states:Object.keys(STATES).length,last:Object.values(STATES).slice(0,10).map(s=>s.state).join('|')});
+  if(!force&&sig===RENDER_SIG)return; RENDER_SIG=sig;
+  renderSubnav(ids); renderSummary();
+  let html=PYLON_VIEW==='overview'?renderOverview(ids):(PYLON_VIEW==='diagnostic'?renderDiagnostic(ids):renderPackDetail(Number(PYLON_VIEW)));
+  $('bms_cards').innerHTML=html;
+}
+function showTab(id,btn){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$(id)?.classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn?.classList.add('active')}
+function copyEntityId(entityId){
+  try{
+    navigator.clipboard?.writeText(entityId);
+  }catch(e){}
+}
+function isNumericEntityState(st){
+  if(!st || bad(st.state))return false;
+  const n=Number(String(st.state).replace(',','.'));
+  return Number.isFinite(n);
+}
+function entityHeaderHtml(entityId,st){
+  const friendly=st?.attributes?.friendly_name || entityId;
+  const unit=st?.attributes?.unit_of_measurement || '';
+  return `<div class="pylon-entity-box"><div class="pylon-entity-label">Entity ID</div><div class="pylon-entity-id">${esc(entityId)}</div><div class="pylon-entity-actions"><button class="pylon-entity-copy" onclick="copyEntityId('${esc(entityId)}')">Copier l’ID</button></div></div><div class="cards2">${card('État actuel',esc(st?.state??'--'),esc(unit),'bat',entityId)}${card('Dernière mise à jour',esc(st?.last_changed?new Date(st.last_changed).toLocaleString():'--'),'','blue',entityId)}</div>`;
+}
+function historyTimeLabel(ts){
+  const d=new Date(ts);
+  if(!Number.isFinite(d.getTime()))return '';
+  return d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+}
+function niceNum(v,d=2){
+  v=Number(v);
+  if(!Number.isFinite(v))return '--';
+  if(Math.abs(v)>=100)return String(Math.round(v));
+  if(Math.abs(v)>=10)return v.toFixed(1);
+  return v.toFixed(d);
+}
+function renderHistorySvg(points,unit){
+  const w=980,h=360,padL=58,padR=18,padT=20,padB=42;
+  if(!points || points.length<2)return `<div class="history-error">Pas assez de points d’historique pour tracer un graphique.</div>`;
+  const xs=points.map(p=>p.t), ys=points.map(p=>p.v);
+  let minX=Math.min(...xs), maxX=Math.max(...xs), minY=Math.min(...ys), maxY=Math.max(...ys);
+  if(minY===maxY){minY-=1;maxY+=1}
+  const yPad=(maxY-minY)*0.08; minY-=yPad; maxY+=yPad;
+  const xScale=t=>padL+(t-minX)/(maxX-minX)*(w-padL-padR);
+  const yScale=v=>padT+(maxY-v)/(maxY-minY)*(h-padT-padB);
+  const line=points.map((p,i)=>`${i?'L':'M'}${xScale(p.t).toFixed(1)},${yScale(p.v).toFixed(1)}`).join(' ');
+  const area=`M${xScale(points[0].t).toFixed(1)},${h-padB} `+points.map(p=>`L${xScale(p.t).toFixed(1)},${yScale(p.v).toFixed(1)}`).join(' ')+` L${xScale(points[points.length-1].t).toFixed(1)},${h-padB} Z`;
+  let grids='', labels='';
+  for(let i=0;i<=4;i++){
+    const y=padT+i*(h-padT-padB)/4;
+    const val=maxY-i*(maxY-minY)/4;
+    grids+=`<line class="history-grid-line" x1="${padL}" y1="${y.toFixed(1)}" x2="${w-padR}" y2="${y.toFixed(1)}"/>`;
+    labels+=`<text class="history-label" x="8" y="${(y+4).toFixed(1)}">${niceNum(val)}${unit?' '+esc(unit):''}</text>`;
+  }
+  const tickIdx=[0,Math.floor(points.length/2),points.length-1];
+  for(const idx of tickIdx){
+    const p=points[idx]; if(!p)continue;
+    labels+=`<text class="history-label" text-anchor="middle" x="${xScale(p.t).toFixed(1)}" y="${h-14}">${historyTimeLabel(p.t)}</text>`;
+  }
+  const last=points[points.length-1];
+  const dot=`<circle class="history-dot" cx="${xScale(last.t).toFixed(1)}" cy="${yScale(last.v).toFixed(1)}" r="5"/>`;
+  return `<svg class="history-svg" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img">${grids}<line class="history-axis" x1="${padL}" y1="${h-padB}" x2="${w-padR}" y2="${h-padB}"/><line class="history-axis" x1="${padL}" y1="${padT}" x2="${padL}" y2="${h-padB}"/><path class="history-area" d="${area}"/><path class="history-line" d="${line}"/>${dot}${labels}</svg>`;
+}
+function normalizeHistoryPayload(payload,entityId){
+  let arr=[];
+  if(Array.isArray(payload)){
+    if(Array.isArray(payload[0])) arr=payload.find(x=>Array.isArray(x)&&(!x[0]||x[0].entity_id===entityId)) || payload[0] || [];
+    else arr=payload;
+  }
+  const points=[];
+  for(const row of arr){
+    const raw=row?.state;
+    const n=Number(String(raw).replace(',','.'));
+    const ts=Date.parse(row?.last_changed || row?.last_updated || row?.lu || row?.last_reported || '');
+    if(Number.isFinite(n)&&Number.isFinite(ts))points.push({t:ts,v:n});
+  }
+  points.sort((a,b)=>a.t-b.t);
+  const filtered=[];
+  for(const p of points){
+    const prev=filtered[filtered.length-1];
+    if(!prev || Math.abs(prev.v-p.v)>1e-9 || (p.t-prev.t)>30*60*1000)filtered.push(p);
+  }
+  return filtered.slice(-500);
+}
+async function fetchHistoryPoints(entityId,hours=24){
+  const start=new Date(Date.now()-hours*3600*1000).toISOString();
+  const apiPath=`history/period/${encodeURIComponent(start)}?filter_entity_id=${encodeURIComponent(entityId)}`;
+  const ha=getParentHassObject();
+  if(ha && typeof ha.callApi==='function'){
+    const payload=await ha.callApi('GET',apiPath);
+    return normalizeHistoryPayload(payload,entityId);
+  }
+  const token=tokenFromStorage();
+  const url=`/api/${apiPath}`;
+  const headers={};
+  if(token)headers.Authorization=`Bearer ${token}`;
+  const res=await fetch(url,{cache:'no-store',headers});
+  if(!res.ok)throw new Error('Historique indisponible');
+  const payload=await res.json();
+  return normalizeHistoryPayload(payload,entityId);
+}
+async function loadNumericHistory(entityId,st){
+  const unit=st?.attributes?.unit_of_measurement || '';
+  const chart=$('history_chart');
+  if(!chart)return;
+  chart.innerHTML='<div class="history-loading">Chargement de l’historique 24h...</div>';
+  try{
+    const points=await fetchHistoryPoints(entityId,24);
+    const min=points.length?Math.min(...points.map(p=>p.v)):NaN;
+    const max=points.length?Math.max(...points.map(p=>p.v)):NaN;
+    chart.innerHTML=`<div class="history-chart-head"><div class="history-chart-title">Historique 24h</div><div class="history-chart-meta">${points.length} points · min ${niceNum(min)}${unit?' '+esc(unit):''} · max ${niceNum(max)}${unit?' '+esc(unit):''}</div></div>${renderHistorySvg(points,unit)}`;
+  }catch(e){
+    chart.innerHTML=`<div class="history-error">Impossible de charger l’historique depuis Home Assistant.<br><span class="small">${esc(e?.message||e)}</span></div>`;
+  }
+}
+function moreInfo(entityId){
+  if(!entityId)return;
+  const st=STATES[entityId];
+  const friendly=st?.attributes?.friendly_name || entityId;
+  $('history_title').textContent=friendly;
+  $('history_sub').textContent=isNumericEntityState(st)?'Graphique et détail entité':'Détail entité Home Assistant';
+  const numeric=isNumericEntityState(st);
+  $('history_body').innerHTML=entityHeaderHtml(entityId,st)+(numeric?'<div class="history-chart-wrap" id="history_chart"><div class="history-loading">Préparation du graphique...</div></div>':'');
+  $('history_modal').classList.add('open');
+  if(numeric)loadNumericHistory(entityId,st);
+}
+function closeMiniHistory(){$('history_modal')?.classList.remove('open')}
+function safeTry(fn){try{return fn()}catch(e){return null}}
+function deepFindHass(node,depth=0){
+  if(!node||depth>6)return null;
+  try{if(node.hass&&node.hass.states)return node.hass}catch(e){}
+  try{if(node.host&&node.host.hass&&node.host.hass.states)return node.host.hass}catch(e){}
+  let kids=[];
+  try{if(node.children)kids=kids.concat(Array.from(node.children))}catch(e){}
+  try{if(node.shadowRoot)kids.push(node.shadowRoot)}catch(e){}
+  for(const k of kids){const h=deepFindHass(k,depth+1);if(h)return h}
+  return null;
+}
+function allReachableWindows(){
+  const out=[], seen=new Set();
+  let w=window;
+  for(let i=0;i<8;i++){
+    try{if(w&&!seen.has(w)){seen.add(w);out.push(w)}}catch(e){}
+    try{if(!w||w.parent===w)break;w=w.parent}catch(e){break}
+  }
+  try{if(window.top&&!seen.has(window.top)){seen.add(window.top);out.push(window.top)}}catch(e){}
+  try{if(window.opener&&!seen.has(window.opener)){seen.add(window.opener);out.push(window.opener)}}catch(e){}
+  return out;
+}
+function getParentHassObject(){
+  for(const w of allReachableWindows()){
+    const candidates=[
+      ()=>w.hass,
+      ()=>w.__hass,
+      ()=>w.document?.querySelector?.('home-assistant')?.hass,
+      ()=>w.document?.querySelector?.('home-assistant-main')?.hass,
+      ()=>w.document?.querySelector?.('ha-panel-lovelace')?.hass,
+      ()=>w.document?.querySelector?.('hui-root')?.hass,
+      ()=>deepFindHass(w.document)
+    ];
+    for(const fn of candidates){
+      const h=safeTry(fn);
+      if(h&&(h.states||h.callWS||h.connection))return h;
+    }
+  }
+  return null;
+}
+let HASS_CALLWS_PENDING=false;
+function applyStateList(list){
+  if(Array.isArray(list)){
+    STATES={};
+    list.forEach(s=>{if(s&&s.entity_id)STATES[s.entity_id]=s});
+    renderDashboard(true);
+    return true;
+  }
+  return false;
+}
+function loadFromParentHass(){
+  const h=getParentHassObject();
+  if(!h)return false;
+  if(h.states&&Object.keys(h.states).length){
+    STATES=h.states;
+    renderDashboard();
+    return true;
+  }
+  if(h.callWS&&!HASS_CALLWS_PENDING){
+    HASS_CALLWS_PENDING=true;
+    h.callWS({type:'get_states'}).then(applyStateList).catch(()=>{}).finally(()=>{HASS_CALLWS_PENDING=false});
+  }
+  return false;
+}
+function findAccessToken(obj,depth=0){
+  if(!obj||depth>7)return null;
+  if(typeof obj==='string'){const t=obj.trim(); if(t.length>40&&(t.startsWith('eyJ')||t.split('.').length>=2))return t; return null}
+  if(typeof obj!=='object')return null;
+  for(const k of ['access_token','accessToken','token','llat'])if(typeof obj[k]==='string'&&obj[k].length>30)return obj[k];
+  for(const v of Object.values(obj)){const f=findAccessToken(v,depth+1); if(f)return f}
+  return null;
+}
+function tokenFromHassObject(){
+  const h=getParentHassObject();
+  return findAccessToken(h?.connection?.options?.auth)||findAccessToken(h?.connection)||findAccessToken(h?.auth)||null;
+}
+function tokenFromStorage(){
+  const wins=allReachableWindows();
+  for(const w of wins){
+    for(const storeName of ['localStorage','sessionStorage']){
+      try{
+        const store=w[storeName];
+        if(!store)continue;
+        for(const k of ['hassTokens','tokens','auth','authTokens','homeAssistant']){
+          const raw=store.getItem(k);
+          if(!raw)continue;
+          const f=findAccessToken(JSON.parse(raw));
+          if(f)return f;
+        }
+        const f=findAccessToken(store);
+        if(f)return f;
+      }catch(e){}
+    }
+  }
+  return tokenFromHassObject();
+}
+function connectWs(){
+  if(WS&&WS.readyState===WebSocket.OPEN)return;
+  if(loadFromParentHass())return;
+  const token=tokenFromStorage(); if(!token)return;
+  const proto=location.protocol==='https:'?'wss':'ws';
+  const url=`${proto}://${location.host}/api/websocket`;
+  try{
+    WS=new WebSocket(url); let id=1;
+    WS.onmessage=ev=>{
+      const msg=JSON.parse(ev.data);
+      if(msg.type==='auth_required')WS.send(JSON.stringify({type:'auth',access_token:token}));
+      if(msg.type==='auth_ok'){WS.send(JSON.stringify({id:id++,type:'get_states'}));WS.send(JSON.stringify({id:id++,type:'subscribe_events',event_type:'state_changed'}));}
+      if(msg.type==='result'&&Array.isArray(msg.result)){STATES={}; msg.result.forEach(s=>STATES[s.entity_id]=s); renderDashboard(true);}
+      if(msg.type==='event'&&msg.event?.event_type==='state_changed'){const ns=msg.event.data?.new_state; if(ns){STATES[ns.entity_id]=ns; renderDashboard();}}
+    };
+  }catch(e){}
+}
+function tick(){loadFromParentHass(); connectWs(); renderDashboard();}
+setInterval(tick,1500);
+window.addEventListener('DOMContentLoaded',()=>{tick();renderDashboard(true)});
+setTimeout(()=>renderDashboard(true),100);
+</script>
+<script>
+// shortcut: translates rendered text nodes by exact match, add new labels to EN when the dashboard gains some
+(function(){
+  const lang=new URLSearchParams(location.search).get('lang');
+  if(lang!=='en')return;
+  document.documentElement.lang='en';
+  const EN={
+    'Premium actif':'Premium active','batteries en ligne':'batteries online','● Système OK':'● System OK',
+    '↻ RAFRAÎCHIR':'↻ REFRESH','Batteries live':'Live batteries','Dernière mise à jour :':'Last update:',
+    '🟢 Données temps réel via Home Assistant':'🟢 Real-time data via Home Assistant','Entité':'Entity',
+    'Valeur actuelle':'Current value','Chargement...':'Loading...','BANQUE PYLONTECH':'PYLONTECH BANK',
+    'Clique pour ouvrir les sous-vues':'Click to open the sub-views','Tension':'Voltage','Puissance':'Power',
+    'Courant':'Current','Température':'Temperature','État batterie':'Battery state','Alarmes':'Alarms',
+    'résumé':'summary','Aucune entité Pylontech détectée pour l’instant.':'No Pylontech entity detected yet.',
+    'Résumé rapide':'Quick summary','Sous-vues sans réglages':'Read-only sub-views','← Retour':'← Back',
+    'Copier l’ID':'Copy ID','Pas assez de points d’historique pour tracer un graphique.':'Not enough history points to draw a chart.',
+    'Chargement de l’historique 24h...':'Loading 24h history...','Historique 24h':'24h history',
+    'Impossible de charger l’historique depuis Home Assistant.':'Unable to load the history from Home Assistant.',
+    'Préparation du graphique...':'Preparing chart...','Batteries en ligne':'Batteries online',
+    'Puissance totale':'Total power','Courant total':'Total current','Tension moyenne':'Average voltage',
+    'État banque':'Bank state','Packs présents':'Packs present','État global':'Overall state',
+    'Température moyenne':'Average temperature','Température basse':'Low temperature','Température haute':'High temperature',
+    'État':'State','Dernier contact':'Last contact','Temp basse':'Low temp','Temp haute':'High temp',
+    'Nom appareil':'Device name','Alarmes / warnings':'Alarms / warnings','Modèle détecté':'Detected model',
+    'Delta max calculé':'Calculated max delta','État actuel':'Current state','Dernière mise à jour':'Last update',
+    'Historique indisponible':'History unavailable','Graphique et détail entité':'Chart and entity detail',
+    'Détail entité Home Assistant':'Home Assistant entity detail',
+    'SOC moyen':'Average SOC','DÉCHARGE':'DISCHARGE','ℹ️ Infos':'ℹ️ Info','⚡ Cellules':'⚡ Cells',
+    '🌐 Vue globale':'🌐 Overview','🩺 États':'🩺 States','📊 Résumé':'📊 Summary',
+    'Détail cellule complet absent ou non activé côté discovery premium.':'Full cell detail missing or not enabled in premium discovery.',
+    'Pour US2000B, on affiche quand même les valeurs agrégées disponibles.':'For US2000B, the available aggregated values are still shown.'
+  };
+  function translate(root){
+    const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+    for(let n=walker.nextNode();n;n=walker.nextNode()){
+      if(n.parentNode.nodeName==='SCRIPT'||n.parentNode.nodeName==='STYLE')continue;
+      const key=n.nodeValue.trim();
+      if(EN[key])n.nodeValue=n.nodeValue.replace(key,EN[key]);
+      else if(/Batterie [0-9]|SOC moyen ·/.test(key))n.nodeValue=n.nodeValue.replace('Batterie','Battery').replace('non détectée','not detected').replace('SOC moyen','Average SOC');
+    }
+  }
+  translate(document.body);
+  new MutationObserver(()=>translate(document.body)).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
+</body></html>

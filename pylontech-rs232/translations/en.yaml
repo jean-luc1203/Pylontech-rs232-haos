@@ -1,0 +1,47 @@
+---
+configuration:
+  pylontech_path:
+    name: "🟪 Pylontech → Serial port path"
+    description: "by-id path of the serial port wired to the console port of the master battery (Menu: Settings-Hardware-All hardware)."
+  packs_count:
+    name: "🟪 Pylontech → Number of packs"
+    description: "Number of packs to poll (1 to 15). 0 = automatic detection."
+  use_gateway:
+    name: "🟨 Pylontech → Use a TCP gateway"
+    description: "Communicate through an IP gateway instead of the local serial port."
+  gateway_ip_port:
+    name: "🟨 Pylontech → Gateway IP address + Port"
+    description: "IP address + port of the network gateway (e.g. 192.168.1.100:5000)."
+  communication_debug:
+    name: "🔴 Pylontech → Communication debug"
+    description: "Enable detailed communication logs (for diagnostics or support)."
+  mqttadresse_port:
+    name: "🚩 MQTT → Broker address + Port"
+    description: "MQTT broker address + port (e.g. core-mosquitto:1883 or local IP + port)."
+  mqttuser:
+    name: "🚩 MQTT → Username"
+    description: "Username to connect to the MQTT broker."
+  mqttpass:
+    name: "🚩 MQTT → Password"
+    description: "Password associated with the MQTT user."
+  mqtt_base_topic:
+    name: "🚩 MQTT → Base topic"
+    description: "Root of the published topics."
+  Send_bip:
+    name: "📊 Add-on usage"
+    description: "Enable a beep to be sent at start-up. No private data is transmitted. Processing complies with the GDPR."
+  premium_section:
+    name: "👑 Premium"
+    description: "Visual separator, do not change."
+  premium_license:
+    name: "👑 Premium → License key"
+    description: "Premium license key, if you have one."
+  dashboard_section:
+    name: "🎨 Dashboard"
+    description: "Visual separator, do not change."
+  dashboard_language:
+    name: "🎨 Dashboard → Language"
+    description: "Dashboard language: fr or en."
+
+network:
+  1893/tcp: "Node-RED web interface"

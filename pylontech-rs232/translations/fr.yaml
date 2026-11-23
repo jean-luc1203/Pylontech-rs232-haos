@@ -1,0 +1,47 @@
+---
+configuration:
+  pylontech_path:
+    name: "🟪 Pylontech → Chemin du port série"
+    description: "Chemin by-id du port série relié au port console de la batterie maître (Menu : Paramètres-Matériel-Tout le matériel)."
+  packs_count:
+    name: "🟪 Pylontech → Nombre de packs"
+    description: "Nombre de packs à interroger (1 à 15). 0 = détection automatique."
+  use_gateway:
+    name: "🟨 Pylontech → Utiliser une passerelle TCP"
+    description: "Activer la communication via une passerelle IP au lieu du port série local."
+  gateway_ip_port:
+    name: "🟨 Pylontech → Adresse IP de la passerelle + Port"
+    description: "Adresse IP + port de la passerelle réseau (ex : 192.168.1.100:5000)."
+  communication_debug:
+    name: "🔴 Pylontech → Débogage de la communication"
+    description: "Activer l'affichage détaillé des journaux de communication (pour le diagnostic ou le support)."
+  mqttadresse_port:
+    name: "🚩 MQTT → Adresse du Broker + Port"
+    description: "Adresse du broker MQTT + port (ex : core-mosquitto:1883 ou IP locale + port)."
+  mqttuser:
+    name: "🚩 MQTT → Nom d'utilisateur"
+    description: "Nom d'utilisateur pour se connecter au broker MQTT."
+  mqttpass:
+    name: "🚩 MQTT → Mot de passe"
+    description: "Mot de passe associé à l'utilisateur MQTT."
+  mqtt_base_topic:
+    name: "🚩 MQTT → Topic de base"
+    description: "Racine des topics publiés."
+  Send_bip:
+    name: "📊 Utilisation de l'add-on"
+    description: "Envoie un bip au démarrage. Aucune donnée privée n'est transmise. Traitement conforme au RGPD."
+  premium_section:
+    name: "👑 Premium"
+    description: "Séparateur visuel, ne pas modifier."
+  premium_license:
+    name: "👑 Premium → Clé de licence"
+    description: "Clé de licence premium, si vous en avez une."
+  dashboard_section:
+    name: "🎨 Dashboard"
+    description: "Séparateur visuel, ne pas modifier."
+  dashboard_language:
+    name: "🎨 Dashboard → Langue"
+    description: "Langue des dashboards : fr ou en."
+
+network:
+  1893/tcp: "Interface web Node-RED"
