@@ -42,3 +42,6 @@ configuration:
   dashboard_language:
     name: "🎨 Dashboard → Langue"
     description: "Langue des dashboards : fr ou en."
+
+network:
+  1893/tcp: "Interface web Node-RED"

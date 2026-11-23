@@ -1,7 +1,7 @@
-## 2.1.0
+## 2.1.1
 
-### Security
-- The Node-RED editor is no longer open on port 1893. It only opens through Home Assistant and asks for a maintainer login.
+### Changed
+- The Node-RED editor is back on port 1893, with the same login as the JK-BMS add-on. The Home Assistant-only access of 2.1.0 is removed.
 
 ## 2.0.9
 

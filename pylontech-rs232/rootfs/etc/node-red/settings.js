@@ -9,16 +9,11 @@ module.exports = {
 
     /* --------------------------------------------------
      * Security
-     * Editor reserved to the maintainers. Users without a hash cannot log in,
-     * so an empty list locks the editor for everyone.
-     * Hash a password with: npx node-red-admin hash-pw
      * -------------------------------------------------- */
+    // Same editor login as the JK-BMS add-on.
     adminAuth: {
         type: "credentials",
-        users: [
-            { username: "alexis", password: "", permissions: "*" },
-            { username: "jean-luc", password: "", permissions: "*" }
-        ].filter((user) => user.password)
+        users: [{ username: "pi", password: "$2a$08$uGLFsGppdWnckZpomdNQveucw.zh8bkSWDO0Gnzj4Z0asqj91KKge", permissions: "*" }]
     },
     httpNodeAuth: null,
     httpStaticAuth: null,
