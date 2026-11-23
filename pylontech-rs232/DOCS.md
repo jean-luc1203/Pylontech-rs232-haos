@@ -78,7 +78,9 @@ A license key is tied to the install ID of your add-on. You will find this ID:
 - in the **Install ID** sensor of the `pylontech1 System` device, under **Diagnostic**;
 - in the MQTT topic `pylontech1/system/info`.
 
-Provide this ID to get your key, then paste the key into `premium_license` and restart the add-on.
+Request your key on [ko-fi.com/smartphoton](https://ko-fi.com/smartphoton) (association Simply Home Energy) with this ID and the name of the module, Pylontech. Then paste the key into `premium_license` and restart the add-on.
+
+Former premium users get their new key for free: mention your previous purchase in your request. If you uninstall and reinstall the add-on, a new install ID is created and you need a new key.
 
 Keys use the SmartPhoton `SPV2` format, as on the JK-BMS add-on, and are issued for the `smartphoton-pylontech` product. A JK-BMS key does not work here. Old keys starting with `SVP|` are no longer accepted.
 
